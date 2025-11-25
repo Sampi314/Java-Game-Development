@@ -32,8 +32,17 @@ const foodData = {
     coffee: { name: 'Coffee', icon: '☕', cookTime: 3000, price: 10 }
 };
 
-// Customer Icons
-const customerIcons = ['👨', '👩', '👦', '👧', '🧑', '👴', '👵', '🧔'];
+// Customer shirt colors for variety
+const customerShirtColors = [
+    'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)', // Red
+    'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', // Blue
+    'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)', // Green
+    'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)', // Orange
+    'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)', // Purple
+    'linear-gradient(135deg, #1abc9c 0%, #16a085 100%)', // Teal
+    'linear-gradient(135deg, #e91e63 0%, #c2185b 100%)', // Pink
+    'linear-gradient(135deg, #34495e 0%, #2c3e50 100%)'  // Gray
+];
 
 // Initialize Game
 function initGame() {
@@ -415,11 +424,11 @@ function spawnCustomer() {
 
     const foodTypes = Object.keys(foodData);
     const randomFood = foodTypes[Math.floor(Math.random() * foodTypes.length)];
-    const customerIcon = customerIcons[Math.floor(Math.random() * customerIcons.length)];
+    const randomShirtColor = customerShirtColors[Math.floor(Math.random() * customerShirtColors.length)];
 
     const customer = {
         id: gameState.nextCustomerId++,
-        icon: customerIcon,
+        shirtColor: randomShirtColor,
         order: randomFood,
         patience: 100,
         tableId: emptyTable.id,
@@ -480,7 +489,22 @@ function updateTableUI(table) {
             </div>
             <div class="table-content">
                 <div class="table-number">Table ${table.id + 1}</div>
-                <div class="customer">${customer.icon}</div>
+                <div class="customer">
+                    <div class="customer-figure">
+                        <div class="customer-head">
+                            <div class="customer-face">
+                                <div class="customer-eye left"></div>
+                                <div class="customer-eye right"></div>
+                                <div class="customer-smile"></div>
+                            </div>
+                        </div>
+                        <div class="customer-body" style="background: ${customer.shirtColor}"></div>
+                        <div class="customer-legs-wrapper">
+                            <div class="customer-leg"></div>
+                            <div class="customer-leg"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="order-label">Wants</div>
                 <div class="customer-order">${food.icon}</div>
                 <div class="patience-bar">
