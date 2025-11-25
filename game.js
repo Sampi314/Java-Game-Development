@@ -15,7 +15,14 @@ const gameState = {
         earnings: 0
     },
     customers: [],
-    nextCustomerId: 1
+    nextCustomerId: 1,
+    waiter: {
+        position: { x: 50, y: 50 },
+        currentFood: null,
+        status: 'idle', // idle, moving_to_table, serving, moving_to_kitchen
+        targetTable: null,
+        servingQueue: []
+    }
 };
 
 // Food Data
@@ -34,9 +41,20 @@ function initGame() {
     createTables();
     setupEventListeners();
     startCustomerSpawning();
+    initializeWaiter();
 
     // Load saved game if exists
     loadGame();
+}
+
+// Initialize Waiter
+function initializeWaiter() {
+    const waiter = document.getElementById('waiter');
+    if (waiter) {
+        waiter.style.left = '50%';
+        waiter.style.top = '50%';
+    }
+    updateWaiterTray();
 }
 
 // Create Tables
@@ -218,6 +236,167 @@ function updateInventoryUI() {
     });
 }
 
+// Waiter Movement System
+function moveWaiterTo(x, y, callback) {
+    const waiter = document.getElementById('waiter');
+    const waiterTray = document.getElementById('waiterTray');
+
+    if (!waiter) return;
+
+    // Add walking class for animation
+    waiter.classList.add('walking');
+
+    // Calculate direction for facing
+    const currentX = parseFloat(waiter.style.left) || 50;
+    const deltaX = x - currentX;
+
+    // Flip waiter based on direction
+    if (deltaX < 0) {
+        waiter.style.transform = 'translate(-50%, -50%) scaleX(-1)';
+    } else {
+        waiter.style.transform = 'translate(-50%, -50%) scaleX(1)';
+    }
+
+    // Move waiter
+    waiter.style.left = x + '%';
+    waiter.style.top = y + '%';
+
+    // Update waiter state
+    gameState.waiter.position = { x, y };
+
+    // Remove walking class after movement completes
+    setTimeout(() => {
+        waiter.classList.remove('walking');
+        if (callback) callback();
+    }, 1000);
+}
+
+function updateWaiterTray() {
+    const waiterTray = document.getElementById('waiterTray');
+    if (!waiterTray) return;
+
+    if (gameState.waiter.currentFood) {
+        const food = foodData[gameState.waiter.currentFood];
+        waiterTray.textContent = food.icon;
+        waiterTray.style.display = 'flex';
+    } else {
+        waiterTray.textContent = '';
+        waiterTray.style.display = 'none';
+    }
+}
+
+function getTablePosition(tableId) {
+    const tableElement = document.getElementById(`table-${tableId}`);
+    if (!tableElement) return { x: 50, y: 50 };
+
+    const container = tableElement.parentElement;
+    const containerRect = container.getBoundingClientRect();
+    const tableRect = tableElement.getBoundingClientRect();
+
+    const x = ((tableRect.left - containerRect.left + tableRect.width / 2) / containerRect.width) * 100;
+    const y = ((tableRect.top - containerRect.top + tableRect.height / 2) / containerRect.height) * 100;
+
+    return { x, y };
+}
+
+function processServingQueue() {
+    // If waiter is busy, return
+    if (gameState.waiter.status !== 'idle') return;
+
+    // If no items in queue, return
+    if (gameState.waiter.servingQueue.length === 0) return;
+
+    // Get next serving task
+    const nextTask = gameState.waiter.servingQueue.shift();
+
+    // Check if we still have the food
+    const foodIndex = gameState.inventory.indexOf(nextTask.foodType);
+    if (foodIndex === -1) {
+        // Food not available, check next task
+        processServingQueue();
+        return;
+    }
+
+    // Check if customer is still at table
+    const table = gameState.tables[nextTask.tableId];
+    if (!table || !table.occupied || !table.customer) {
+        // Customer left, check next task
+        processServingQueue();
+        return;
+    }
+
+    // Remove food from inventory
+    gameState.inventory.splice(foodIndex, 1);
+    updateInventoryUI();
+
+    // Set waiter state
+    gameState.waiter.status = 'moving_to_table';
+    gameState.waiter.currentFood = nextTask.foodType;
+    gameState.waiter.targetTable = nextTask.tableId;
+    updateWaiterTray();
+
+    // Move to kitchen first to pick up food
+    moveWaiterTo(80, 30, () => {
+        showNotification(`Waiter picked up ${foodData[nextTask.foodType].name}!`, 'info');
+
+        // Then move to table
+        const tablePos = getTablePosition(nextTask.tableId);
+        moveWaiterTo(tablePos.x, tablePos.y, () => {
+            serveCustomerByWaiter(nextTask.tableId);
+        });
+    });
+}
+
+function serveCustomerByWaiter(tableId) {
+    const table = gameState.tables[tableId];
+    if (!table || !table.customer) {
+        gameState.waiter.status = 'idle';
+        gameState.waiter.currentFood = null;
+        gameState.waiter.targetTable = null;
+        updateWaiterTray();
+        processServingQueue();
+        return;
+    }
+
+    const customer = table.customer;
+
+    // Calculate earnings
+    const basePrice = foodData[customer.order].price;
+    const earningsMultiplier = 1 + (gameState.upgrades.earnings * 0.2);
+    const satisfactionBonus = customer.satisfied ? 1.5 : 1;
+    const earnings = Math.floor(basePrice * earningsMultiplier * satisfactionBonus);
+
+    gameState.money += earnings;
+    gameState.customersServed++;
+
+    // Level up
+    if (gameState.customersServed % 10 === 0) {
+        gameState.level++;
+        showNotification(`🎉 Level Up! Now level ${gameState.level}!`, 'success');
+    }
+
+    // Clear patience interval
+    clearInterval(customer.patienceInterval);
+
+    // Show earnings
+    showNotification(`Served ${foodData[customer.order].icon}! +$${earnings} ${customer.satisfied ? '⭐' : ''}`, 'success');
+
+    // Remove customer
+    customerLeaves(customer, true);
+
+    // Reset waiter
+    gameState.waiter.status = 'idle';
+    gameState.waiter.currentFood = null;
+    gameState.waiter.targetTable = null;
+    updateWaiterTray();
+
+    updateUI();
+    saveGame();
+
+    // Process next item in queue
+    setTimeout(() => processServingQueue(), 500);
+}
+
 // Customer System
 function startCustomerSpawning() {
     setInterval(() => {
@@ -337,36 +516,19 @@ function serveCustomer(tableId) {
         return;
     }
 
-    // Remove food from inventory
-    gameState.inventory.splice(foodIndex, 1);
-    updateInventoryUI();
+    // Add to waiter's serving queue
+    gameState.waiter.servingQueue.push({
+        tableId: tableId,
+        foodType: customer.order
+    });
 
-    // Calculate earnings
-    const basePrice = foodData[customer.order].price;
-    const earningsMultiplier = 1 + (gameState.upgrades.earnings * 0.2);
-    const satisfactionBonus = customer.satisfied ? 1.5 : 1;
-    const earnings = Math.floor(basePrice * earningsMultiplier * satisfactionBonus);
+    showNotification('Waiter will serve this table!', 'info');
 
-    gameState.money += earnings;
-    gameState.customersServed++;
-
-    // Level up
-    if (gameState.customersServed % 10 === 0) {
-        gameState.level++;
-        showNotification(`🎉 Level Up! Now level ${gameState.level}!`, 'success');
-    }
-
-    // Clear patience interval
-    clearInterval(customer.patienceInterval);
-
-    // Show earnings
-    showNotification(`+$${earnings} ${customer.satisfied ? '⭐' : ''}`, 'success');
-
-    // Remove customer
-    customerLeaves(customer, true);
-
+    // Update UI to disable serve button
     updateUI();
-    saveGame();
+
+    // Start processing queue
+    processServingQueue();
 }
 
 function customerLeaves(customer, served) {
