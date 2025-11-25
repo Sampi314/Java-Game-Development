@@ -1,0 +1,472 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.game-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.game-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+.game-header h1 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.stat-value {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.game-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+@media (max-width: 968px) {
+    .game-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kitchen-area,
+.restaurant-area {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+    border-bottom: 3px solid #f5576c;
+    padding-bottom: 10px;
+}
+
+h3 {
+    color: #555;
+    margin: 15px 0 10px 0;
+    font-size: 1.2em;
+}
+
+/* Cooking Stations */
+.cooking-stations {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.station {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.station.locked {
+    background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+    opacity: 0.8;
+}
+
+.station-header {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+}
+
+.station-content {
+    padding: 15px;
+}
+
+.food-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.cook-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cook-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cook-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cook-btn small {
+    display: block;
+    font-size: 0.8em;
+    margin-top: 3px;
+}
+
+.cooking-progress {
+    margin: 15px 0;
+    text-align: center;
+}
+
+.progress-bar {
+    background: rgba(0, 0, 0, 0.2);
+    height: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.cooking-item {
+    font-size: 1.5em;
+    min-height: 30px;
+    font-weight: bold;
+}
+
+.serve-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.serve-btn:hover {
+    transform: scale(1.05);
+}
+
+.unlock-message {
+    text-align: center;
+    padding: 20px;
+}
+
+.unlock-message p {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.unlock-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.unlock-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Food Inventory */
+.food-inventory {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+
+.inventory-items {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-height: 50px;
+}
+
+.inventory-item {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 1.5em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.inventory-item:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Restaurant Tables */
+.tables-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.table {
+    background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.table.occupied {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.table.empty {
+    opacity: 0.6;
+}
+
+.table-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.customer {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.customer-order {
+    font-size: 1.8em;
+    margin: 5px 0;
+}
+
+.patience-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.patience-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000 0%, #00ff00 100%);
+    width: 100%;
+    transition: width 0.5s linear;
+}
+
+.serve-table-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.serve-table-btn:hover:not(:disabled) {
+    transform: scale(1.1);
+}
+
+.serve-table-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Upgrades Panel */
+.upgrades-panel {
+    background: white;
+    padding: 20px;
+    margin: 0 20px 20px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.upgrades-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.upgrade-item {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.upgrade-info {
+    flex: 1;
+}
+
+.upgrade-info strong {
+    display: block;
+    color: #333;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.upgrade-info p {
+    color: #555;
+    font-size: 0.9em;
+    margin: 3px 0;
+}
+
+.upgrade-cost {
+    font-weight: bold;
+    color: #f5576c;
+}
+
+.upgrade-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: all 0.3s;
+}
+
+.upgrade-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.upgrade-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: slideIn 0.3s, slideOut 0.3s 2.7s;
+    font-weight: bold;
+}
+
+.notification.success {
+    border-left: 5px solid #43e97b;
+    color: #43e97b;
+}
+
+.notification.error {
+    border-left: 5px solid #ff0000;
+    color: #ff0000;
+}
+
+.notification.info {
+    border-left: 5px solid #4facfe;
+    color: #4facfe;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
