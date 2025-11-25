@@ -171,9 +171,10 @@ body {
     );
     border-radius: 15px;
     padding: 30px;
-    min-height: 400px;
+    min-height: 500px;
     box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.1);
     position: relative;
+    overflow: visible;
 }
 
 .restaurant-floor::before {
@@ -188,6 +189,176 @@ body {
     pointer-events: none;
 }
 
+/* Animated Waiter Character */
+.waiter {
+    position: absolute;
+    width: 60px;
+    height: 80px;
+    z-index: 100;
+    transition: left 1s ease-in-out, top 1s ease-in-out, transform 0.3s ease;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
+}
+
+.waiter.walking {
+    animation: none;
+}
+
+.waiter.walking .waiter-legs {
+    animation: walking 0.6s infinite;
+}
+
+.waiter-body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.waiter-head {
+    font-size: 2.5em;
+    margin-bottom: 5px;
+    animation: headBob 0.8s infinite ease-in-out;
+    transform-origin: center bottom;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes headBob {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-3px) scale(1.05); }
+}
+
+.waiter-legs {
+    position: relative;
+    width: 40px;
+    height: 30px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.leg {
+    width: 8px;
+    height: 20px;
+    background: linear-gradient(180deg, #333 0%, #555 100%);
+    border-radius: 4px;
+    transform-origin: top center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes walking {
+    0% {
+        transform: translateY(0);
+    }
+    25% {
+        transform: translateY(-2px);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    75% {
+        transform: translateY(-2px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.leg.left {
+    animation: legLeft 0.6s infinite;
+}
+
+.leg.right {
+    animation: legRight 0.6s infinite;
+}
+
+@keyframes legLeft {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-15deg); }
+}
+
+@keyframes legRight {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(15deg); }
+}
+
+.waiter.walking .leg.left {
+    animation: legLeftWalk 0.4s infinite;
+}
+
+.waiter.walking .leg.right {
+    animation: legRightWalk 0.4s infinite;
+}
+
+@keyframes legLeftWalk {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(20deg); }
+    75% { transform: rotate(-20deg); }
+}
+
+@keyframes legRightWalk {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-20deg); }
+    75% { transform: rotate(20deg); }
+}
+
+.food-tray {
+    position: absolute;
+    top: 40%;
+    right: -25px;
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+    border-radius: 50%;
+    border: 3px solid #ccc;
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.3),
+        inset 0 2px 5px rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    animation: trayFloat 1s infinite ease-in-out;
+}
+
+@keyframes trayFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-4px) rotate(-5deg); }
+}
+
+.food-tray::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 12px;
+    background: linear-gradient(180deg, #888 0%, #555 100%);
+    border-radius: 2px;
+}
+
+.waiter-shadow {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: shadowPulse 0.8s infinite ease-in-out;
+}
+
+@keyframes shadowPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.4; }
+    50% { transform: translateX(-50%) scale(1.1); opacity: 0.6; }
+}
+
 .tables-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -195,17 +366,19 @@ body {
     perspective: 1000px;
 }
 
-/* Isometric Tables */
+/* Isometric Tables - Enhanced 2.5D */
 .table {
     position: relative;
-    height: 200px;
+    height: 220px;
     cursor: pointer;
     transform-style: preserve-3d;
     transition: all 0.3s ease;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
 }
 
 .table:hover {
-    transform: translateY(-5px) scale(1.05);
+    transform: translateY(-8px) scale(1.05);
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.35));
 }
 
 .table-base {
@@ -892,5 +1065,22 @@ body {
 
     .upgrades-list {
         grid-template-columns: 1fr;
+    }
+
+    /* Waiter responsive adjustments */
+    .waiter {
+        width: 50px;
+        height: 65px;
+    }
+
+    .waiter-head {
+        font-size: 2em;
+    }
+
+    .food-tray {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2em;
+        right: -20px;
     }
 }
