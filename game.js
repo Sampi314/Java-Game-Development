@@ -62,8 +62,12 @@ function createTableElement(table) {
     div.className = 'table empty';
     div.id = `table-${table.id}`;
     div.innerHTML = `
-        <div class="table-icon">🪑</div>
-        <div>Table ${table.id + 1}</div>
+        <div class="table-base">
+            <div class="table-top"></div>
+        </div>
+        <div class="table-content">
+            <div class="table-number">Table ${table.id + 1}</div>
+        </div>
     `;
     return div;
 }
@@ -194,6 +198,11 @@ function updateInventoryUI() {
     const inventoryElement = document.getElementById('inventory');
     inventoryElement.innerHTML = '';
 
+    if (gameState.inventory.length === 0) {
+        inventoryElement.innerHTML = '<div class="inventory-placeholder">Cook food to fill your tray!</div>';
+        return;
+    }
+
     const foodCount = {};
     gameState.inventory.forEach(food => {
         foodCount[food] = (foodCount[food] || 0) + 1;
@@ -287,21 +296,31 @@ function updateTableUI(table) {
 
         tableElement.className = 'table occupied';
         tableElement.innerHTML = `
-            <div class="customer">${customer.icon}</div>
-            <div class="customer-order">${food.icon}</div>
-            <div>Wants ${food.name}</div>
-            <div class="patience-bar">
-                <div class="patience-fill"></div>
+            <div class="table-base">
+                <div class="table-top"></div>
             </div>
-            <button class="serve-table-btn" onclick="serveCustomer(${table.id})" ${
-                gameState.inventory.includes(customer.order) ? '' : 'disabled'
-            }>Serve</button>
+            <div class="table-content">
+                <div class="table-number">Table ${table.id + 1}</div>
+                <div class="customer">${customer.icon}</div>
+                <div class="order-label">Wants</div>
+                <div class="customer-order">${food.icon}</div>
+                <div class="patience-bar">
+                    <div class="patience-fill"></div>
+                </div>
+                <button class="serve-table-btn" onclick="serveCustomer(${table.id})" ${
+                    gameState.inventory.includes(customer.order) ? '' : 'disabled'
+                }>Serve</button>
+            </div>
         `;
     } else {
         tableElement.className = 'table empty';
         tableElement.innerHTML = `
-            <div class="table-icon">🪑</div>
-            <div>Table ${table.id + 1}</div>
+            <div class="table-base">
+                <div class="table-top"></div>
+            </div>
+            <div class="table-content">
+                <div class="table-number">Table ${table.id + 1}</div>
+            </div>
         `;
     }
 }

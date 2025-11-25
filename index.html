@@ -12,120 +12,188 @@
             <h1>🍽️ Happy Restaurant</h1>
             <div class="stats">
                 <div class="stat-item">
-                    <span class="stat-label">💰 Money:</span>
-                    <span id="money" class="stat-value">100</span>
+                    <span class="stat-label">💰</span>
+                    <div class="stat-content">
+                        <div class="stat-title">Money</div>
+                        <span id="money" class="stat-value">100</span>
+                    </div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">⭐ Level:</span>
-                    <span id="level" class="stat-value">1</span>
+                    <span class="stat-label">⭐</span>
+                    <div class="stat-content">
+                        <div class="stat-title">Level</div>
+                        <span id="level" class="stat-value">1</span>
+                    </div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">👥 Customers Served:</span>
-                    <span id="customersServed" class="stat-value">0</span>
+                    <span class="stat-label">👥</span>
+                    <div class="stat-content">
+                        <div class="stat-title">Served</div>
+                        <span id="customersServed" class="stat-value">0</span>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <div class="game-content">
-            <!-- Kitchen Area -->
-            <div class="kitchen-area">
-                <h2>🍳 Kitchen</h2>
-                <div class="cooking-stations">
-                    <div class="station" id="station1">
-                        <div class="station-header">Cooking Station 1</div>
-                        <div class="station-content">
-                            <div class="food-buttons">
-                                <button class="cook-btn" data-food="burger" data-station="1">
-                                    🍔 Burger<br><small>(5s, $15)</small>
-                                </button>
-                                <button class="cook-btn" data-food="pizza" data-station="1">
-                                    🍕 Pizza<br><small>(8s, $25)</small>
-                                </button>
-                                <button class="cook-btn" data-food="coffee" data-station="1">
-                                    ☕ Coffee<br><small>(3s, $10)</small>
-                                </button>
-                            </div>
-                            <div class="cooking-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill"></div>
-                                </div>
-                                <div class="cooking-item"></div>
-                            </div>
-                            <button class="serve-btn" style="display: none;">Serve</button>
-                        </div>
+        <div class="game-world">
+            <div class="game-content">
+                <!-- Restaurant Dining Area - Main View -->
+                <div class="restaurant-area">
+                    <div class="area-header">
+                        <h2>🏪 Dining Area</h2>
                     </div>
-
-                    <div class="station locked" id="station2" data-unlock-cost="200">
-                        <div class="station-header">Cooking Station 2</div>
-                        <div class="station-content">
-                            <div class="unlock-message">
-                                <p>🔒 Unlock for $200</p>
-                                <button class="unlock-btn" data-station="2">Unlock Station</button>
-                            </div>
-                            <div class="food-buttons" style="display: none;">
-                                <button class="cook-btn" data-food="burger" data-station="2">
-                                    🍔 Burger<br><small>(5s, $15)</small>
-                                </button>
-                                <button class="cook-btn" data-food="pizza" data-station="2">
-                                    🍕 Pizza<br><small>(8s, $25)</small>
-                                </button>
-                                <button class="cook-btn" data-food="coffee" data-station="2">
-                                    ☕ Coffee<br><small>(3s, $10)</small>
-                                </button>
-                            </div>
-                            <div class="cooking-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill"></div>
-                                </div>
-                                <div class="cooking-item"></div>
-                            </div>
-                            <button class="serve-btn" style="display: none;">Serve</button>
+                    <div class="restaurant-floor">
+                        <div class="tables-container" id="tablesContainer">
+                            <!-- Tables will be generated dynamically -->
                         </div>
                     </div>
                 </div>
 
-                <div class="food-inventory">
-                    <h3>Ready to Serve:</h3>
-                    <div id="inventory" class="inventory-items"></div>
+                <!-- Kitchen Area - Side Panel -->
+                <div class="kitchen-area">
+                    <div class="area-header">
+                        <h2>🍳 Kitchen</h2>
+                    </div>
+                    <div class="cooking-stations">
+                        <div class="station" id="station1">
+                            <div class="station-wrapper">
+                                <div class="station-top"></div>
+                                <div class="station-front">
+                                    <div class="station-header">
+                                        <span class="station-icon">👨‍🍳</span>
+                                        <span>Station 1</span>
+                                    </div>
+                                    <div class="station-content">
+                                        <div class="food-buttons">
+                                            <button class="cook-btn" data-food="burger" data-station="1">
+                                                <span class="food-icon">🍔</span>
+                                                <span class="food-name">Burger</span>
+                                                <span class="food-info">5s • $15</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="pizza" data-station="1">
+                                                <span class="food-icon">🍕</span>
+                                                <span class="food-name">Pizza</span>
+                                                <span class="food-info">8s • $25</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="coffee" data-station="1">
+                                                <span class="food-icon">☕</span>
+                                                <span class="food-name">Coffee</span>
+                                                <span class="food-info">3s • $10</span>
+                                            </button>
+                                        </div>
+                                        <div class="cooking-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill"></div>
+                                            </div>
+                                            <div class="cooking-item"></div>
+                                        </div>
+                                        <button class="serve-btn" style="display: none;">
+                                            <span>✓ Add to Tray</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="station locked" id="station2" data-unlock-cost="200">
+                            <div class="station-wrapper">
+                                <div class="station-top"></div>
+                                <div class="station-front">
+                                    <div class="station-header">
+                                        <span class="station-icon">🔒</span>
+                                        <span>Station 2</span>
+                                    </div>
+                                    <div class="station-content">
+                                        <div class="unlock-message">
+                                            <p class="unlock-text">Unlock Station</p>
+                                            <p class="unlock-price">$200</p>
+                                            <button class="unlock-btn" data-station="2">
+                                                <span>🔓 Unlock</span>
+                                            </button>
+                                        </div>
+                                        <div class="food-buttons" style="display: none;">
+                                            <button class="cook-btn" data-food="burger" data-station="2">
+                                                <span class="food-icon">🍔</span>
+                                                <span class="food-name">Burger</span>
+                                                <span class="food-info">5s • $15</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="pizza" data-station="2">
+                                                <span class="food-icon">🍕</span>
+                                                <span class="food-name">Pizza</span>
+                                                <span class="food-info">8s • $25</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="coffee" data-station="2">
+                                                <span class="food-icon">☕</span>
+                                                <span class="food-name">Coffee</span>
+                                                <span class="food-info">3s • $10</span>
+                                            </button>
+                                        </div>
+                                        <div class="cooking-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill"></div>
+                                            </div>
+                                            <div class="cooking-item"></div>
+                                        </div>
+                                        <button class="serve-btn" style="display: none;">
+                                            <span>✓ Add to Tray</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="food-inventory">
+                        <div class="inventory-header">
+                            <span class="inventory-icon">🍽️</span>
+                            <span>Ready to Serve</span>
+                        </div>
+                        <div id="inventory" class="inventory-items">
+                            <div class="inventory-placeholder">Cook food to fill your tray!</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Restaurant Area -->
-            <div class="restaurant-area">
-                <h2>🏪 Dining Area</h2>
-                <div class="tables-container" id="tablesContainer">
-                    <!-- Tables will be generated dynamically -->
+            <!-- Upgrades Panel -->
+            <div class="upgrades-panel">
+                <div class="upgrades-header">
+                    <h2>⬆️ Upgrades Shop</h2>
                 </div>
-            </div>
-        </div>
-
-        <!-- Upgrades Panel -->
-        <div class="upgrades-panel">
-            <h2>⬆️ Upgrades</h2>
-            <div class="upgrades-list">
-                <div class="upgrade-item">
-                    <div class="upgrade-info">
-                        <strong>⚡ Cooking Speed</strong>
-                        <p>Reduce cooking time by 10%</p>
-                        <p class="upgrade-cost">Cost: $<span id="speedUpgradeCost">150</span></p>
+                <div class="upgrades-list">
+                    <div class="upgrade-item">
+                        <div class="upgrade-icon">⚡</div>
+                        <div class="upgrade-info">
+                            <strong>Cooking Speed</strong>
+                            <p>-10% cooking time</p>
+                        </div>
+                        <div class="upgrade-action">
+                            <div class="upgrade-cost">$<span id="speedUpgradeCost">150</span></div>
+                            <button class="upgrade-btn" id="speedUpgrade">Buy</button>
+                        </div>
                     </div>
-                    <button class="upgrade-btn" id="speedUpgrade">Upgrade</button>
-                </div>
-                <div class="upgrade-item">
-                    <div class="upgrade-info">
-                        <strong>💺 More Tables</strong>
-                        <p>Add one more table</p>
-                        <p class="upgrade-cost">Cost: $<span id="tableUpgradeCost">300</span></p>
+                    <div class="upgrade-item">
+                        <div class="upgrade-icon">💺</div>
+                        <div class="upgrade-info">
+                            <strong>More Tables</strong>
+                            <p>+1 dining table</p>
+                        </div>
+                        <div class="upgrade-action">
+                            <div class="upgrade-cost">$<span id="tableUpgradeCost">300</span></div>
+                            <button class="upgrade-btn" id="tableUpgrade">Buy</button>
+                        </div>
                     </div>
-                    <button class="upgrade-btn" id="tableUpgrade">Upgrade</button>
-                </div>
-                <div class="upgrade-item">
-                    <div class="upgrade-info">
-                        <strong>💵 Better Service</strong>
-                        <p>Increase earnings by 20%</p>
-                        <p class="upgrade-cost">Cost: $<span id="earningsUpgradeCost">250</span></p>
+                    <div class="upgrade-item">
+                        <div class="upgrade-icon">💵</div>
+                        <div class="upgrade-info">
+                            <strong>Better Service</strong>
+                            <p>+20% earnings</p>
+                        </div>
+                        <div class="upgrade-action">
+                            <div class="upgrade-cost">$<span id="earningsUpgradeCost">250</span></div>
+                            <button class="upgrade-btn" id="earningsUpgrade">Buy</button>
+                        </div>
                     </div>
-                    <button class="upgrade-btn" id="earningsUpgrade">Upgrade</button>
                 </div>
             </div>
         </div>
