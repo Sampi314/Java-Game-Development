@@ -1575,6 +1575,135 @@ function loadGame() {
     }
 }
 
+// ================================
+// RECIPE BOOK FUNCTIONALITY
+// ================================
+
+/**
+ * Toggle Recipe Book modal visibility with animation
+ */
+function toggleRecipeBook() {
+    const modal = document.getElementById('recipeBookModal');
+    if (!modal) return;
+
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        // Show modal
+        modal.style.display = 'flex';
+        renderRecipeBook();
+
+        // Add animation class
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    } else {
+        // Hide modal with fade out
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+/**
+ * Render all recipes in the Recipe Book with beautiful animations
+ */
+function renderRecipeBook() {
+    const grid = document.getElementById('recipeBookGrid');
+    const unlockedCountEl = document.getElementById('unlockedCount');
+    const currentLevelEl = document.getElementById('currentLevelDisplay');
+
+    if (!grid) return;
+
+    // Update stats
+    const unlockedRecipes = getUnlockedRecipes();
+    const totalRecipes = Object.keys(foodData).length;
+
+    if (unlockedCountEl) unlockedCountEl.textContent = unlockedRecipes.length;
+    if (currentLevelEl) currentLevelEl.textContent = gameState.level;
+
+    // Clear grid
+    grid.innerHTML = '';
+
+    // Sort recipes by unlock level
+    const sortedRecipes = Object.entries(foodData).sort((a, b) => {
+        return a[1].unlockLevel - b[1].unlockLevel;
+    });
+
+    // Create recipe cards
+    sortedRecipes.forEach(([key, recipe]) => {
+        const isUnlocked = gameState.level >= recipe.unlockLevel;
+
+        const card = document.createElement('div');
+        card.className = `recipe-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+
+        // Calculate cook time in seconds
+        const cookTimeSeconds = (recipe.cookTime / 1000).toFixed(1);
+
+        card.innerHTML = `
+            <div class="lock-badge">
+                ${isUnlocked ? '✓' : '🔒'}
+            </div>
+            <div class="unlock-level">
+                Level ${recipe.unlockLevel}
+            </div>
+            <div class="recipe-icon">
+                ${recipe.icon}
+            </div>
+            <div class="recipe-name">
+                ${recipe.name}
+            </div>
+            <div class="recipe-details">
+                <div class="recipe-detail-item">
+                    <span class="recipe-detail-label">Price</span>
+                    <span class="recipe-detail-value">$${recipe.price}</span>
+                </div>
+                <div class="recipe-detail-item">
+                    <span class="recipe-detail-label">Time</span>
+                    <span class="recipe-detail-value">${cookTimeSeconds}s</span>
+                </div>
+            </div>
+        `;
+
+        // Add click effect for unlocked recipes
+        if (isUnlocked) {
+            card.addEventListener('click', () => {
+                // Add bounce animation
+                card.style.animation = 'none';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 10);
+
+                // Show notification with recipe details
+                showNotification(`${recipe.icon} ${recipe.name} - $${recipe.price} | ${cookTimeSeconds}s`, 'success');
+            });
+        } else {
+            card.addEventListener('click', () => {
+                // Show unlock requirement
+                showNotification(`🔒 Unlock at Level ${recipe.unlockLevel}`, 'info');
+            });
+        }
+
+        grid.appendChild(card);
+    });
+}
+
+/**
+ * Update Recipe Book stats when game state changes
+ */
+function updateRecipeBookStats() {
+    const unlockedCountEl = document.getElementById('unlockedCount');
+    const currentLevelEl = document.getElementById('currentLevelDisplay');
+
+    if (unlockedCountEl) {
+        const unlockedRecipes = getUnlockedRecipes();
+        unlockedCountEl.textContent = unlockedRecipes.length;
+    }
+
+    if (currentLevelEl) {
+        currentLevelEl.textContent = gameState.level;
+    }
+}
+
 // Auto-save every 30 seconds
 setInterval(() => {
     saveGame();

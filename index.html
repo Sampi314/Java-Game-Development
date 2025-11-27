@@ -45,8 +45,40 @@
                         <span>🤖 Auto-Serve</span>
                     </label>
                 </div>
+                <div class="stat-item">
+                    <button class="recipe-book-btn" id="recipeBookBtn" onclick="toggleRecipeBook()">
+                        📖 Recipes
+                    </button>
+                </div>
             </div>
         </header>
+
+        <!-- Recipe Book Modal -->
+        <div class="recipe-book-modal" id="recipeBookModal" style="display: none;">
+            <div class="recipe-book-content">
+                <div class="recipe-book-header">
+                    <h2>📖 Recipe Book</h2>
+                    <button class="close-btn" onclick="toggleRecipeBook()">✕</button>
+                </div>
+                <div class="recipe-book-stats">
+                    <div class="recipe-stat">
+                        <span class="recipe-stat-label">Unlocked:</span>
+                        <span class="recipe-stat-value" id="unlockedCount">3</span>
+                    </div>
+                    <div class="recipe-stat">
+                        <span class="recipe-stat-label">Total:</span>
+                        <span class="recipe-stat-value">16</span>
+                    </div>
+                    <div class="recipe-stat">
+                        <span class="recipe-stat-label">Current Level:</span>
+                        <span class="recipe-stat-value" id="currentLevelDisplay">1</span>
+                    </div>
+                </div>
+                <div class="recipe-book-grid" id="recipeBookGrid">
+                    <!-- Recipes will be generated dynamically -->
+                </div>
+            </div>
+        </div>
 
         <div class="game-world">
             <div class="game-content">
@@ -56,6 +88,20 @@
                         <h2>🏪 Dining Area</h2>
                     </div>
                     <div class="restaurant-floor">
+                        <!-- Restaurant Walls - Restaurant City Style -->
+                        <div class="restaurant-walls"></div>
+
+                        <!-- Entrance Door with Animation -->
+                        <div class="entrance-door">
+                            <div class="door-sign">🍽️ OPEN</div>
+                            <div class="door-frame">
+                                <div class="door-panel">
+                                    <div class="door-window"></div>
+                                    <div class="door-handle"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Food Storage Tables on Restaurant Floor -->
                         <div class="floor-storage-area">
                             <div class="floor-storage-header">📦 Food Storage</div>
