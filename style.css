@@ -1883,6 +1883,72 @@ body {
     }
 }
 
+/* Quick Food Counter */
+.quick-food-counter {
+    margin: 20px 0;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe5a0 100%);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    border: 3px solid #ffc107;
+}
+
+.counter-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--dark);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ffb300;
+}
+
+.counter-icon {
+    font-size: 1.5em;
+}
+
+.counter-items {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 60px;
+    align-items: center;
+}
+
+.counter-placeholder {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+}
+
+.counter-food-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ffc107;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.counter-food-item .food-3d {
+    transform: scale(0.5);
+}
+
+.counter-food-count {
+    color: #ff6f00;
+    font-size: 1.3em;
+}
+
 /* Responsive Design */
 /* Food Storage Area */
 .food-storage-area {
