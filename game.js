@@ -60,6 +60,8 @@ const gameState = {
     },
     customers: [],
     nextCustomerId: 1,
+    restaurantRating: 5.0, // Restaurant rating out of 5 stars
+    totalRatings: 0,
     // Multiple staff members - Restaurant City style!
     staff: [
         {
@@ -863,6 +865,12 @@ function serveCustomerByWaiter(tableId) {
     gameState.money += earnings;
     gameState.customersServed++;
 
+    // Update restaurant rating based on customer satisfaction
+    const customerRating = customer.satisfied ? 5.0 : (customer.patience / 100) * 5;
+    gameState.totalRatings++;
+    gameState.restaurantRating =
+        (gameState.restaurantRating * (gameState.totalRatings - 1) + customerRating) / gameState.totalRatings;
+
     // Level up
     if (gameState.customersServed % 10 === 0) {
         gameState.level++;
@@ -1275,10 +1283,58 @@ function upgradeEarnings() {
 }
 
 // UI Updates
+function updateStaffIndicators() {
+    // Update server indicator
+    const serverIndicator = document.querySelector('.server-indicator');
+    const cleanerIndicator = document.querySelector('.cleaner-indicator');
+    const cookIndicator = document.querySelector('.cook-indicator');
+
+    if (serverIndicator) {
+        const server = getServerStaff();
+        serverIndicator.style.borderColor = server.status === 'idle' ? '#3498db' : '#f39c12';
+        serverIndicator.style.background = server.status === 'idle'
+            ? 'linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%)'
+            : 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)';
+    }
+
+    if (cleanerIndicator) {
+        const cleaner = getCleanerStaff();
+        cleanerIndicator.style.borderColor = cleaner.status === 'idle' ? '#2ecc71' : '#f39c12';
+        cleanerIndicator.style.background = cleaner.status === 'idle'
+            ? 'linear-gradient(135deg, #ffffff 0%, #e8f5e9 100%)'
+            : 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)';
+    }
+
+    if (cookIndicator) {
+        const cook = getCookStaff();
+        cookIndicator.style.borderColor = cook.status === 'idle' ? '#e74c3c' : '#f39c12';
+        cookIndicator.style.background = cook.status === 'idle'
+            ? 'linear-gradient(135deg, #ffffff 0%, #ffebee 100%)'
+            : 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)';
+    }
+}
+
 function updateUI() {
     document.getElementById('money').textContent = gameState.money;
     document.getElementById('level').textContent = gameState.level;
     document.getElementById('customersServed').textContent = gameState.customersServed;
+
+    // Update restaurant rating display
+    const ratingElement = document.getElementById('restaurantRating');
+    if (ratingElement) {
+        const rating = gameState.restaurantRating.toFixed(1);
+        ratingElement.textContent = rating;
+        // Color based on rating
+        if (gameState.restaurantRating >= 4.5) {
+            ratingElement.style.color = '#4caf50'; // Green for excellent
+        } else if (gameState.restaurantRating >= 3.5) {
+            ratingElement.style.color = '#ffc107'; // Yellow for good
+        } else {
+            ratingElement.style.color = '#f44336'; // Red for poor
+        }
+    }
+
+    updateStaffIndicators();
 
     // Update serve buttons based on inventory - FIX: Update ALL tables
     gameState.tables.forEach(table => {
@@ -1323,6 +1379,8 @@ function saveGame() {
         money: gameState.money,
         level: gameState.level,
         customersServed: gameState.customersServed,
+        restaurantRating: gameState.restaurantRating,
+        totalRatings: gameState.totalRatings,
         inventory: gameState.inventory,
         storageTables: gameState.storageTables,
         upgrades: gameState.upgrades,
@@ -1339,6 +1397,8 @@ function loadGame() {
         gameState.money = data.money || 100;
         gameState.level = data.level || 1;
         gameState.customersServed = data.customersServed || 0;
+        gameState.restaurantRating = data.restaurantRating || 5.0;
+        gameState.totalRatings = data.totalRatings || 0;
 
         // Restore inventory
         if (data.inventory) {
