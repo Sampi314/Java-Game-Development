@@ -159,6 +159,8 @@ body {
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     position: relative;
+    transform-style: preserve-3d;
+    perspective: 1200px;
 }
 
 /* Restaurant Walls */
@@ -217,8 +219,10 @@ body {
 
 .restaurant-floor {
     background:
+        /* Grid lines */
         linear-gradient(90deg, #8b5a3c 2px, transparent 2px),
         linear-gradient(#8b5a3c 2px, transparent 2px),
+        /* Checkerboard pattern */
         repeating-linear-gradient(
             0deg,
             #d4a574 0px,
@@ -239,12 +243,19 @@ body {
     padding: 30px;
     min-height: 500px;
     box-shadow:
-        inset 0 4px 20px rgba(0, 0, 0, 0.15),
-        inset 0 -4px 20px rgba(0, 0, 0, 0.1),
-        0 0 0 3px #8b5a3c;
+        /* Strong inner shadows for depth */
+        inset 0 6px 30px rgba(0, 0, 0, 0.25),
+        inset 0 -6px 30px rgba(0, 0, 0, 0.15),
+        inset 6px 0 30px rgba(0, 0, 0, 0.1),
+        inset -6px 0 30px rgba(0, 0, 0, 0.1),
+        /* Border highlight */
+        0 0 0 3px #8b5a3c,
+        /* Outer shadow for elevation */
+        0 8px 25px rgba(0, 0, 0, 0.3);
     position: relative;
     overflow: visible;
     border: 2px solid #a0724e;
+    transform-style: preserve-3d;
 }
 
 .restaurant-floor::before {
@@ -290,14 +301,14 @@ body {
 /* Animated 3D Waiter Character */
 .waiter {
     position: absolute;
-    width: 80px;
-    height: 120px;
+    width: 85px;
+    height: 130px;
     z-index: 100;
     transition: left 1s ease-in-out, top 1s ease-in-out, transform 0.3s ease;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
 }
 
 .waiter-character {
@@ -313,15 +324,21 @@ body {
 /* Head and Face */
 .waiter-head {
     position: relative;
-    width: 32px;
-    height: 32px;
-    background: radial-gradient(circle at 30% 30%, #ffdbac 0%, #f4c49c 50%, #d9a066 100%);
-    border-radius: 50%;
-    margin-bottom: 4px;
+    width: 36px;
+    height: 38px;
+    background:
+        /* Face shape gradient */
+        radial-gradient(ellipse at 45% 40%, #ffe4c4 0%, #ffd7b5 30%, #f4c49c 60%, #e6b88c 85%, #d9a066 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 45% 45%;
+    margin-bottom: 2px;
     box-shadow:
-        inset -3px -3px 8px rgba(0, 0, 0, 0.2),
-        inset 3px 3px 8px rgba(255, 255, 255, 0.4),
-        0 4px 8px rgba(0, 0, 0, 0.3);
+        /* Nose shadow */
+        inset 0px -2px 4px rgba(0, 0, 0, 0.1),
+        /* Cheek highlights */
+        inset -4px -4px 10px rgba(0, 0, 0, 0.15),
+        inset 4px 4px 12px rgba(255, 255, 255, 0.5),
+        /* Outer shadow */
+        0 6px 12px rgba(0, 0, 0, 0.35);
     animation: headBob 0.8s infinite ease-in-out;
     z-index: 10;
 }
@@ -341,32 +358,51 @@ body {
 
 .eye {
     position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #2c3e50;
+    width: 5px;
+    height: 6px;
+    background:
+        radial-gradient(circle at 40% 35%, #ffffff 0%, #ffffff 25%, transparent 25%),
+        radial-gradient(circle, #1a1a1a 0%, #2c3e50 70%, #3d5a6b 100%);
     border-radius: 50%;
-    top: 12px;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    top: 14px;
+    box-shadow:
+        inset 0 2px 3px rgba(0, 0, 0, 0.6),
+        0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .left-eye {
-    left: 8px;
+    left: 9px;
 }
 
 .right-eye {
-    right: 8px;
+    right: 9px;
 }
 
 .smile {
     position: absolute;
-    width: 10px;
-    height: 6px;
-    border: 1px solid #c89060;
+    width: 14px;
+    height: 7px;
+    border: 2px solid #d4956b;
     border-top: none;
-    border-radius: 0 0 10px 10px;
+    border-radius: 0 0 14px 14px;
     bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
+    box-shadow: 0 1px 2px rgba(200, 144, 96, 0.4);
+}
+
+/* Add a nose */
+.face::before {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 5px;
+    background: linear-gradient(135deg, #e6b88c 0%, #d9a066 100%);
+    border-radius: 0 0 3px 3px;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: -1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* Chef Hat */
@@ -401,14 +437,25 @@ body {
 /* Torso */
 .waiter-torso {
     position: relative;
-    width: 36px;
-    height: 40px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    border-radius: 8px 8px 4px 4px;
+    width: 42px;
+    height: 44px;
+    background:
+        /* Button details */
+        radial-gradient(circle at 50% 15%, #ffffff 0%, #ffffff 8%, transparent 8%),
+        radial-gradient(circle at 50% 50%, #ffffff 0%, #ffffff 8%, transparent 8%),
+        radial-gradient(circle at 50% 85%, #ffffff 0%, #ffffff 8%, transparent 8%),
+        /* Main shirt gradient */
+        linear-gradient(135deg, #4db8ff 0%, #3498db 40%, #2980b9 70%, #21618c 100%);
+    border-radius: 10px 10px 5px 5px;
     box-shadow:
-        inset -3px 0 8px rgba(0, 0, 0, 0.2),
-        inset 3px 0 8px rgba(255, 255, 255, 0.2),
-        0 4px 8px rgba(0, 0, 0, 0.3);
+        /* Chest depth */
+        inset -4px 0 10px rgba(0, 0, 0, 0.25),
+        inset 4px 0 10px rgba(255, 255, 255, 0.25),
+        /* Side shadows */
+        inset 0 4px 8px rgba(255, 255, 255, 0.3),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+        /* Outer shadow */
+        0 5px 10px rgba(0, 0, 0, 0.35);
     z-index: 5;
 }
 
@@ -995,9 +1042,12 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 180px);
     gap: 30px;
-    perspective: 1000px;
+    perspective: 1500px;
     justify-content: center;
     padding: 20px;
+    transform-style: preserve-3d;
+    position: relative;
+    z-index: 20;
 }
 
 @media (max-width: 900px) {
@@ -1184,11 +1234,12 @@ body {
 /* 3D Customer Figure */
 .customer {
     position: relative;
-    width: 50px;
-    height: 70px;
+    width: 52px;
+    height: 75px;
     margin: 10px auto;
     animation: customerBounce 1s infinite ease-in-out;
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+    transform-style: preserve-3d;
 }
 
 @keyframes customerBounce {
@@ -2056,9 +2107,79 @@ body {
     font-size: 1.3em;
 }
 
+/* Food Storage Tables on Restaurant Floor */
+.floor-storage-area {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 50;
+}
+
+.floor-storage-header {
+    background: linear-gradient(135deg, #e6b886 0%, #d9a066 100%);
+    color: #4a3422;
+    padding: 8px 15px;
+    border-radius: 10px 10px 0 0;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: center;
+    border: 3px solid #a0724e;
+    border-bottom: none;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.floor-storage-tables {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    border-radius: 0 0 15px 15px;
+    border: 3px solid #a0724e;
+    border-top: none;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.floor-storage-table {
+    min-height: 150px;
+    padding: 15px;
+    width: 140px;
+    transform: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.floor-storage-table .storage-table-top {
+    display: none; /* Hide the 3D top effect for floor tables */
+}
+
+.floor-storage-table .storage-label {
+    font-size: 1em;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.floor-storage-table .storage-foods {
+    min-height: 80px;
+    padding: 10px;
+}
+
+.floor-storage-table .storage-food-item {
+    padding: 8px 12px;
+}
+
+.floor-storage-table .food-3d {
+    transform: scale(0.5);
+}
+
+.floor-storage-table .storage-food-count {
+    font-size: 1.2em;
+}
+
 /* Responsive Design */
-/* Food Storage Area */
+/* Food Storage Area (OLD - keeping for backwards compatibility) */
 .food-storage-area {
+    display: none; /* Hidden - now using floor-storage-area instead */
     margin-top: 20px;
     background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
     padding: 25px;
