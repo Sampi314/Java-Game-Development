@@ -2091,10 +2091,38 @@ body {
 }
 
 .floor-storage-table {
-    min-height: auto;
-    padding: 12px;
-    transform: scale(0.75);
-    transform-origin: top left;
+    min-height: 150px;
+    padding: 15px;
+    width: 140px;
+    transform: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.floor-storage-table .storage-table-top {
+    display: none; /* Hide the 3D top effect for floor tables */
+}
+
+.floor-storage-table .storage-label {
+    font-size: 1em;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.floor-storage-table .storage-foods {
+    min-height: 80px;
+    padding: 10px;
+}
+
+.floor-storage-table .storage-food-item {
+    padding: 8px 12px;
+}
+
+.floor-storage-table .food-3d {
+    transform: scale(0.5);
+}
+
+.floor-storage-table .storage-food-count {
+    font-size: 1.2em;
 }
 
 /* Responsive Design */
