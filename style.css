@@ -298,6 +298,195 @@ body {
     pointer-events: none;
 }
 
+/* Restaurant Decorations - Restaurant City Style */
+.restaurant-decorations {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.decoration {
+    position: absolute;
+    filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
+}
+
+/* Decorative Plants */
+.plant-decoration {
+    width: 60px;
+    height: 80px;
+    animation: plantSway 3s infinite ease-in-out;
+}
+
+@keyframes plantSway {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(2deg); }
+}
+
+.plant-left {
+    bottom: 20px;
+    left: 20px;
+}
+
+.plant-right {
+    bottom: 20px;
+    right: 20px;
+}
+
+.plant-pot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(135deg, #d2691e 0%, #8b4513 50%, #654321 100%);
+    border-radius: 5px 5px 15px 15px;
+    box-shadow:
+        inset 0 3px 8px rgba(0, 0, 0, 0.4),
+        inset 0 -2px 6px rgba(255, 255, 255, 0.2),
+        0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid #654321;
+}
+
+.plant-leaves {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+}
+
+.leaf {
+    position: absolute;
+    width: 25px;
+    height: 35px;
+    background: radial-gradient(ellipse at 30% 30%, #90ee90 0%, #4caf50 50%, #2e7d32 100%);
+    border-radius: 50% 0 50% 0;
+    box-shadow:
+        inset -2px -2px 5px rgba(0, 0, 0, 0.3),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.3),
+        0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.leaf:nth-child(1) {
+    left: 10px;
+    top: 0;
+    transform: rotate(-20deg);
+}
+
+.leaf:nth-child(2) {
+    right: 10px;
+    top: 5px;
+    transform: rotate(20deg);
+}
+
+.leaf:nth-child(3) {
+    left: 50%;
+    top: -5px;
+    transform: translateX(-50%) rotate(0deg);
+}
+
+/* Welcome Sign */
+.welcome-sign {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: signSwing 4s infinite ease-in-out;
+}
+
+@keyframes signSwing {
+    0%, 100% { transform: translateX(-50%) rotate(-1deg); }
+    50% { transform: translateX(-50%) rotate(1deg); }
+}
+
+.sign-board {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+    padding: 12px 25px;
+    border-radius: 15px;
+    border: 4px solid #b8860b;
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.4),
+        inset 0 3px 10px rgba(255, 255, 255, 0.6),
+        inset 0 -3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sign-text {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #8b4513;
+    text-shadow:
+        2px 2px 4px rgba(255, 255, 255, 0.8),
+        -1px -1px 2px rgba(0, 0, 0, 0.3);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Staff Indicators */
+.staff-indicators {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.staff-indicator {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 3px solid #4caf50;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        inset 0 2px 6px rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s ease;
+    animation: staffBadgePulse 2s infinite ease-in-out;
+}
+
+@keyframes staffBadgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.staff-indicator:hover {
+    transform: scale(1.1);
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.4),
+        inset 0 2px 6px rgba(255, 255, 255, 0.8);
+}
+
+.server-indicator {
+    border-color: #3498db;
+}
+
+.cleaner-indicator {
+    border-color: #2ecc71;
+}
+
+.cook-indicator {
+    border-color: #e74c3c;
+}
+
+.staff-icon {
+    font-size: 2em;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.staff-name {
+    font-size: 0.75em;
+    font-weight: bold;
+    color: #2c3e50;
+    text-transform: uppercase;
+}
+
 /* Animated 3D Waiter Character */
 .waiter {
     position: absolute;
