@@ -1181,6 +1181,9 @@ function updateTableUI(table) {
                     ${get3DFoodHTML(table.plateFood)}
                     <div class="plate-icon">🍽️</div>
                 </div>
+                <button class="clean-table-btn" onclick="cleanTable(${table.id})">
+                    🧹 Clean Table
+                </button>
             </div>
         `;
     } else {
@@ -1239,6 +1242,28 @@ function serveCustomer(tableId) {
 
     // Start processing queue
     processServingQueue();
+}
+
+// Clean dirty table - player can click to clean
+function cleanTable(tableId) {
+    const table = gameState.tables[tableId];
+    if (!table || !table.dirtyPlate) return;
+
+    // Add cleaning task to cleaner's queue
+    if (gameState.cleaner && gameState.cleaner.unlocked) {
+        // Cleaner will handle it
+        if (!gameState.dirtyTables.includes(tableId)) {
+            gameState.dirtyTables.push(tableId);
+        }
+        showNotification('Cleaner will clean this table!', 'info');
+    } else {
+        // Manual cleaning - instant
+        table.dirtyPlate = false;
+        table.plateFood = null;
+        showNotification('Table cleaned! ✨', 'success');
+    }
+
+    updateUI();
 }
 
 function customerLeaves(customer, served) {

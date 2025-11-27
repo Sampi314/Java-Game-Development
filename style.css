@@ -218,63 +218,85 @@ body {
 }
 
 .restaurant-floor {
-    /* Restaurant City-style isometric tile floor */
+    /* Restaurant City-style polished tile floor */
     background:
-        /* Diamond/Isometric tile pattern - Restaurant City style */
+        /* Elegant tile pattern with squares */
         repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 35px,
-            rgba(139, 90, 60, 0.3) 35px,
-            rgba(139, 90, 60, 0.3) 37px,
-            transparent 37px,
-            transparent 70px
+            90deg,
+            transparent 0px,
+            transparent 58px,
+            rgba(139, 90, 60, 0.25) 58px,
+            rgba(139, 90, 60, 0.25) 60px,
+            rgba(200, 168, 130, 0.15) 60px,
+            rgba(200, 168, 130, 0.15) 62px,
+            transparent 62px,
+            transparent 120px
         ),
         repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 35px,
-            rgba(139, 90, 60, 0.3) 35px,
-            rgba(139, 90, 60, 0.3) 37px,
-            transparent 37px,
-            transparent 70px
+            0deg,
+            transparent 0px,
+            transparent 58px,
+            rgba(139, 90, 60, 0.25) 58px,
+            rgba(139, 90, 60, 0.25) 60px,
+            rgba(200, 168, 130, 0.15) 60px,
+            rgba(200, 168, 130, 0.15) 62px,
+            transparent 62px,
+            transparent 120px
         ),
-        /* Alternating tile colors for depth */
-        repeating-conic-gradient(
-            from 45deg at 50px 50px,
-            #d4a574 0deg,
-            #d4a574 90deg,
-            #c8a882 90deg,
-            #c8a882 180deg,
-            #d4a574 180deg,
-            #d4a574 270deg,
-            #c8a882 270deg,
-            #c8a882 360deg
+        /* Checkered alternating tiles */
+        repeating-linear-gradient(
+            0deg,
+            #dab68a 0px,
+            #dab68a 60px,
+            #cca876 60px,
+            #cca876 120px
         ),
-        /* Base wooden floor color */
-        linear-gradient(135deg, #d2a679 0%, #c09960 100%);
-    background-size: 100px 100px, 100px 100px, 100px 100px, 100%;
-    background-position: 0 0, 0 0, 0 0, 0 0;
+        repeating-linear-gradient(
+            90deg,
+            #d4b184 0px,
+            #d4b184 60px,
+            #c6a372 60px,
+            #c6a372 120px
+        ),
+        /* Base polished floor color */
+        linear-gradient(135deg, #e8d0a8 0%, #d4b184 25%, #c6a372 50%, #b8956a 75%, #a8845c 100%);
+    background-size: 120px 120px, 120px 120px, 120px 120px, 120px 120px, 100%;
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
     border-radius: 0;
     padding: 40px;
     min-height: 500px;
     box-shadow:
-        /* Restaurant City-style 3D depth shadows */
-        inset 0 8px 40px rgba(0, 0, 0, 0.3),
-        inset 0 -8px 40px rgba(0, 0, 0, 0.2),
-        inset 8px 0 40px rgba(0, 0, 0, 0.15),
-        inset -8px 0 40px rgba(0, 0, 0, 0.15),
+        /* Polished floor highlights */
+        inset 0 10px 50px rgba(0, 0, 0, 0.25),
+        inset 0 -10px 50px rgba(0, 0, 0, 0.15),
+        inset 10px 0 50px rgba(0, 0, 0, 0.12),
+        inset -10px 0 50px rgba(0, 0, 0, 0.12),
+        /* Glossy top shine */
+        inset 0 3px 10px rgba(255, 255, 255, 0.15),
         /* Wall border effect */
-        0 0 0 8px #6b4423,
-        0 0 0 12px #8b5a3c,
+        0 0 0 10px #6b4423,
+        0 0 0 15px #8b5a3c,
         /* Outer shadow for elevation */
-        0 12px 35px rgba(0, 0, 0, 0.4);
+        0 15px 40px rgba(0, 0, 0, 0.45);
     position: relative;
     overflow: visible;
-    border: 4px solid #4a2f1a;
+    border: 5px solid #4a2f1a;
     transform-style: preserve-3d;
-    /* Isometric perspective hint */
-    perspective: 1200px;
+    /* TRUE 2.5D ISOMETRIC PARALLELOGRAM/RHOMBUS - Restaurant City Style */
+    perspective: 1500px;
+    perspective-origin: 50% 50%;
+    transform: rotateX(55deg) rotateZ(45deg) scale(1.2);
+    transform-origin: center center;
+    animation: floorGleam 12s ease-in-out infinite;
+}
+
+@keyframes floorGleam {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.05);
+    }
 }
 
 .restaurant-floor::before {
@@ -400,13 +422,14 @@ body {
 /* Entrance Door - Restaurant City Style */
 .entrance-door {
     position: absolute;
-    top: 20px;
+    top: -280px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
-    height: 160px;
-    z-index: 100;
+    width: 100px;
+    height: 140px;
+    z-index: -1;
     pointer-events: none;
+    opacity: 0;  /* Hidden - we have a wall door already */
 }
 
 .door-frame {
@@ -1226,6 +1249,35 @@ body {
     position: relative;
     display: inline-block;
     transform-style: preserve-3d;
+    perspective: 800px;
+    animation: foodFloat 3s ease-in-out infinite, foodRotate 6s linear infinite;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+    transition: all 0.3s ease;
+}
+
+.food-3d:hover {
+    transform: scale(1.15) translateY(-5px);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5))
+            drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
+    animation: foodFloat 1.5s ease-in-out infinite, foodRotate 3s linear infinite;
+}
+
+@keyframes foodFloat {
+    0%, 100% {
+        transform: translateY(0px) rotateY(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotateY(10deg);
+    }
+}
+
+@keyframes foodRotate {
+    0% {
+        transform: rotateZ(0deg);
+    }
+    100% {
+        transform: rotateZ(360deg);
+    }
 }
 
 /* 3D Burger */
@@ -1241,17 +1293,38 @@ body {
 }
 
 .burger-top-bun {
-    width: 40px;
-    height: 18px;
-    background: radial-gradient(circle at 40% 30%, #f4d4a0 0%, #d9a066 50%, #c4895c 100%);
-    border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+    width: 42px;
+    height: 20px;
+    background:
+        /* Highlight for 3D sphere effect */
+        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.4) 0%, transparent 40%),
+        radial-gradient(circle at 65% 70%, rgba(0, 0, 0, 0.1) 0%, transparent 50%),
+        /* Main bun color */
+        radial-gradient(ellipse at 40% 30%, #f4d4a0 0%, #e6c08a 30%, #d9a066 60%, #c4895c 100%);
+    border-radius: 50% 50% 20% 20% / 65% 65% 40% 40%;
     box-shadow:
-        inset -2px -2px 5px rgba(0, 0, 0, 0.2),
-        inset 2px 2px 5px rgba(255, 255, 255, 0.4),
-        0 4px 8px rgba(0, 0, 0, 0.3);
+        /* Strong 3D depth */
+        inset -3px -3px 8px rgba(0, 0, 0, 0.25),
+        inset 3px 3px 8px rgba(255, 255, 255, 0.5),
+        /* Bun edge highlight */
+        inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+        /* Ground shadow */
+        0 5px 12px rgba(0, 0, 0, 0.35),
+        /* Glow */
+        0 0 10px rgba(255, 215, 0, 0.2);
     position: relative;
     z-index: 5;
     margin-bottom: -3px;
+    animation: bunBounce 2s ease-in-out infinite;
+}
+
+@keyframes bunBounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-2px) scale(1.02);
+    }
 }
 
 .burger-top-bun::after {
@@ -1296,17 +1369,48 @@ body {
 }
 
 .burger-patty {
-    width: 38px;
-    height: 10px;
-    background: radial-gradient(circle at 40% 40%, #8d6e63 0%, #5d4037 50%, #3e2723 100%);
-    border-radius: 4px;
+    width: 40px;
+    height: 12px;
+    background:
+        /* Grilled texture spots */
+        radial-gradient(circle at 25% 30%, rgba(0, 0, 0, 0.3) 0%, transparent 15%),
+        radial-gradient(circle at 70% 60%, rgba(0, 0, 0, 0.25) 0%, transparent 18%),
+        radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.2) 0%, transparent 12%),
+        /* 3D highlight */
+        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
+        /* Main patty color with depth */
+        radial-gradient(ellipse at 40% 35%, #9d7e6f 0%, #8d6e63 25%, #5d4037 60%, #3e2723 100%);
+    border-radius: 6px;
     box-shadow:
-        inset -2px -2px 4px rgba(0, 0, 0, 0.4),
-        inset 2px 2px 4px rgba(139, 110, 99, 0.3),
-        2px 3px 6px rgba(0, 0, 0, 0.4);
+        /* 3D depth */
+        inset -3px -3px 6px rgba(0, 0, 0, 0.5),
+        inset 3px 3px 6px rgba(139, 110, 99, 0.4),
+        /* Steam glow */
+        inset 0 1px 3px rgba(255, 255, 255, 0.1),
+        /* Ground shadow */
+        3px 4px 8px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 2;
     margin-bottom: -2px;
+    animation: pattySizzle 1.5s ease-in-out infinite;
+}
+
+@keyframes pattySizzle {
+    0%, 100% {
+        box-shadow:
+            inset -3px -3px 6px rgba(0, 0, 0, 0.5),
+            inset 3px 3px 6px rgba(139, 110, 99, 0.4),
+            inset 0 1px 3px rgba(255, 255, 255, 0.1),
+            3px 4px 8px rgba(0, 0, 0, 0.5);
+    }
+    50% {
+        box-shadow:
+            inset -3px -3px 6px rgba(0, 0, 0, 0.5),
+            inset 3px 3px 6px rgba(139, 110, 99, 0.4),
+            inset 0 1px 3px rgba(255, 255, 255, 0.1),
+            3px 4px 8px rgba(0, 0, 0, 0.5),
+            0 0 12px rgba(255, 100, 0, 0.3);
+    }
 }
 
 .burger-bottom-bun {
@@ -1811,61 +1915,131 @@ body {
 
 .chair {
     position: absolute;
-    width: 28px;
-    height: 32px;
+    width: 32px;
+    height: 38px;
     transform-style: preserve-3d;
+    perspective: 600px;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+    animation: chairHover 3s ease-in-out infinite;
 }
 
-/* Chair seat */
+@keyframes chairHover {
+    0%, 100% {
+        filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6));
+    }
+}
+
+/* Chair seat - Enhanced 3D depth */
 .chair-seat {
     position: absolute;
-    width: 28px;
-    height: 22px;
-    background: linear-gradient(135deg, #b8926b 0%, #9d7a54 40%, #8b6847 70%, #7a5938 100%);
-    border-radius: 6px;
-    top: 8px;
+    width: 30px;
+    height: 24px;
+    background:
+        /* Wood grain texture */
+        repeating-linear-gradient(
+            88deg,
+            transparent 0px,
+            transparent 8px,
+            rgba(109, 70, 40, 0.1) 8px,
+            rgba(109, 70, 40, 0.1) 9px
+        ),
+        /* 3D highlight for depth */
+        radial-gradient(ellipse at 30% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 75%, rgba(0, 0, 0, 0.2) 0%, transparent 50%),
+        /* Main wood color */
+        linear-gradient(135deg, #c9a87a 0%, #b8926b 25%, #9d7a54 50%, #8b6847 75%, #7a5938 100%);
+    border-radius: 8px;
+    top: 10px;
     box-shadow:
-        inset 0 2px 6px rgba(255, 255, 255, 0.3),
-        inset 0 -2px 6px rgba(0, 0, 0, 0.4),
-        0 4px 8px rgba(0, 0, 0, 0.3);
+        /* Strong 3D depth shadows */
+        inset -3px -3px 8px rgba(0, 0, 0, 0.45),
+        inset 3px 3px 8px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.3),
+        /* Ground shadow */
+        0 6px 12px rgba(0, 0, 0, 0.4),
+        /* Edge definition */
+        0 0 0 1px rgba(109, 70, 40, 0.6);
     border: 2px solid #6d4628;
+    transform: rotateX(15deg);
 }
 
-/* Chair backrest */
+/* Chair backrest - Taller and more 3D */
 .chair-back {
     position: absolute;
-    width: 24px;
-    height: 18px;
-    background: linear-gradient(180deg, #b8926b 0%, #9d7a54 50%, #8b6847 100%);
-    border-radius: 4px 4px 2px 2px;
+    width: 26px;
+    height: 22px;
+    background:
+        /* Wood grain */
+        repeating-linear-gradient(
+            180deg,
+            transparent 0px,
+            transparent 4px,
+            rgba(109, 70, 40, 0.1) 4px,
+            rgba(109, 70, 40, 0.1) 5px
+        ),
+        /* 3D highlights */
+        radial-gradient(ellipse at 35% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 45%),
+        radial-gradient(ellipse at 65% 80%, rgba(0, 0, 0, 0.15) 0%, transparent 45%),
+        /* Main color gradient */
+        linear-gradient(180deg, #c9a87a 0%, #b8926b 20%, #9d7a54 50%, #8b6847 80%, #7a5938 100%);
+    border-radius: 6px 6px 3px 3px;
     top: 0;
     left: 2px;
     box-shadow:
-        inset 0 2px 4px rgba(255, 255, 255, 0.3),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-        0 2px 6px rgba(0, 0, 0, 0.3);
-    border: 1.5px solid #6d4628;
+        /* 3D depth */
+        inset -3px 0 6px rgba(0, 0, 0, 0.4),
+        inset 3px 0 6px rgba(255, 255, 255, 0.35),
+        inset 0 3px 5px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.35),
+        /* Cast shadow on seat */
+        0 4px 8px rgba(0, 0, 0, 0.35),
+        /* Edge */
+        0 0 0 1px rgba(109, 70, 40, 0.5);
+    border: 2px solid #6d4628;
+    transform: rotateX(-5deg) translateZ(5px);
 }
 
-/* Chair legs */
+/* Chair legs - More visible and 3D */
 .chair-seat::before,
 .chair-seat::after {
     content: '';
     position: absolute;
-    width: 4px;
-    height: 10px;
-    background: linear-gradient(90deg, #6d4628 0%, #8b6847 50%, #6d4628 100%);
-    border-radius: 2px;
-    bottom: -10px;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    width: 5px;
+    height: 14px;
+    background:
+        /* Cylindrical 3D effect */
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 40%),
+        linear-gradient(90deg,
+            #5a3d28 0%,
+            #6d4628 20%,
+            #8b6847 50%,
+            #6d4628 80%,
+            #5a3d28 100%
+        );
+    border-radius: 3px;
+    bottom: -14px;
+    box-shadow:
+        /* 3D leg shadows */
+        inset -2px 0 4px rgba(0, 0, 0, 0.5),
+        inset 2px 0 3px rgba(139, 104, 71, 0.3),
+        /* Ground shadow */
+        3px 4px 6px rgba(0, 0, 0, 0.6),
+        /* Edge */
+        0 0 0 0.5px rgba(0, 0, 0, 0.3);
+    transform: translateZ(-5px);
 }
 
 .chair-seat::before {
     left: 3px;
+    transform: translateZ(-5px) rotateY(-3deg);
 }
 
 .chair-seat::after {
     right: 3px;
+    transform: translateZ(-5px) rotateY(3deg);
 }
 
 /* Chair positions around table */
@@ -1922,14 +2096,35 @@ body {
     width: 52px;
     height: 75px;
     margin: 10px auto;
-    animation: customerBounce 1s infinite ease-in-out;
-    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+    animation: customerBounce 3s infinite ease-in-out, customerSway 4s infinite ease-in-out;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.45));
     transform-style: preserve-3d;
+    perspective: 600px;
 }
 
+/* Restaurant City-style customer animations */
 @keyframes customerBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-6px) scale(1.02);
+    }
+}
+
+@keyframes customerSway {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-2px) rotate(-1deg);
+    }
+    50% {
+        transform: translateY(0) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-2px) rotate(1deg);
+    }
 }
 
 .customer-figure {
@@ -1942,17 +2137,38 @@ body {
 }
 
 .customer-head {
-    width: 26px;
-    height: 26px;
-    background: radial-gradient(circle at 35% 35%, #ffe4c4 0%, #f4c49c 40%, #e6b88c 70%, #d9a066 100%);
+    width: 28px;
+    height: 28px;
+    background:
+        /* Highlight for 3D sphere effect */
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.6) 0%, transparent 30%),
+        radial-gradient(circle at 70% 75%, rgba(0, 0, 0, 0.15) 0%, transparent 40%),
+        /* Main skin tone */
+        radial-gradient(ellipse at 40% 35%, #ffe4c4 0%, #f4c49c 35%, #e6b88c 65%, #d9a066 100%);
     border-radius: 50%;
     margin-bottom: 2px;
     box-shadow:
-        inset -3px -3px 6px rgba(0, 0, 0, 0.2),
-        inset 3px 3px 6px rgba(255, 255, 255, 0.5),
-        0 4px 8px rgba(0, 0, 0, 0.35);
+        /* 3D depth shadows */
+        inset -4px -4px 8px rgba(0, 0, 0, 0.25),
+        inset 4px 4px 8px rgba(255, 255, 255, 0.6),
+        /* Neck shadow */
+        0 3px 0 rgba(0, 0, 0, 0.15),
+        /* Ground shadow */
+        0 5px 12px rgba(0, 0, 0, 0.4),
+        /* Glow */
+        0 0 8px rgba(255, 228, 196, 0.3);
     position: relative;
     z-index: 5;
+    animation: headBob 2s ease-in-out infinite;
+}
+
+@keyframes headBob {
+    0%, 100% {
+        transform: translateY(0) rotateX(0deg);
+    }
+    50% {
+        transform: translateY(-2px) rotateX(-3deg);
+    }
 }
 
 .customer-face {
@@ -1963,22 +2179,42 @@ body {
 
 .customer-eye {
     position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #2c3e50;
+    width: 5px;
+    height: 5px;
+    background:
+        /* Eye shine/highlight */
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8) 0%, transparent 40%),
+        /* Main eye color */
+        radial-gradient(circle, #2c3e50 0%, #1a252f 100%);
     border-radius: 50%;
     top: 10px;
     box-shadow:
-        inset 0 1px 2px rgba(0, 0, 0, 0.5),
-        0 1px 1px rgba(255, 255, 255, 0.3);
+        inset 0 2px 3px rgba(0, 0, 0, 0.6),
+        0 1px 2px rgba(255, 255, 255, 0.4),
+        0 0 4px rgba(44, 62, 80, 0.3);
+    border: 0.5px solid rgba(0, 0, 0, 0.3);
+    animation: eyeBlink 5s infinite;
+}
+
+@keyframes eyeBlink {
+    0%, 48%, 52%, 100% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scaleY(0.1);
+        opacity: 0.5;
+    }
 }
 
 .customer-eye.left {
     left: 7px;
+    animation-delay: 0s;
 }
 
 .customer-eye.right {
     right: 7px;
+    animation-delay: 0.05s;
 }
 
 .customer-smile {
@@ -1995,30 +2231,149 @@ body {
 }
 
 .customer-body {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     /* Background set via inline style for variety */
-    border-radius: 8px 8px 4px 4px;
+    border-radius: 10px 10px 5px 5px;
     box-shadow:
-        inset -3px 0 6px rgba(0, 0, 0, 0.25),
-        inset 3px 0 6px rgba(255, 255, 255, 0.2),
-        0 4px 8px rgba(0, 0, 0, 0.35);
+        /* 3D depth with stronger shadows */
+        inset -4px 0 8px rgba(0, 0, 0, 0.3),
+        inset 4px 0 8px rgba(255, 255, 255, 0.25),
+        inset 0 3px 6px rgba(255, 255, 255, 0.2),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.25),
+        /* Ground shadow */
+        0 5px 10px rgba(0, 0, 0, 0.4);
     margin-bottom: 2px;
     position: relative;
     z-index: 4;
+    animation: bodyBreath 3s ease-in-out infinite;
+}
+
+@keyframes bodyBreath {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);
+    }
 }
 
 .customer-body::before {
     content: '';
     position: absolute;
-    top: 3px;
+    top: 4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    background:
+        radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.5) 0%, transparent 60%);
     pointer-events: none;
+}
+
+/* Add chest button detail */
+.customer-body::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow:
+        0 6px 0 rgba(0, 0, 0, 0.3),
+        0 12px 0 rgba(0, 0, 0, 0.3),
+        inset 0 0.5px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Customer Arms - 3D with hands */
+.customer-body {
+    /* Generate arms using additional pseudo-elements */
+}
+
+/* Left Arm */
+.customer-figure::before {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 18px;
+    background:
+        /* Arm highlight */
+        radial-gradient(ellipse at 30% 20%, rgba(255, 228, 196, 0.3) 0%, transparent 50%),
+        /* Main arm color - matches body */
+        linear-gradient(180deg, currentColor 0%, currentColor 100%);
+    border-radius: 3px;
+    top: 40px;
+    left: 4px;
+    box-shadow:
+        inset -1px 0 2px rgba(0, 0, 0, 0.3),
+        inset 1px 0 2px rgba(255, 255, 255, 0.2),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+    transform: rotateZ(-15deg);
+    transform-origin: top;
+    animation: leftArmSway 2s ease-in-out infinite;
+}
+
+/* Left Hand */
+.customer-figure::before::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: -1px;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle at 40% 30%, #ffe4c4 0%, #e6b88c 60%, #d9a066 100%);
+    border-radius: 50%;
+    box-shadow:
+        inset -1px -1px 2px rgba(0, 0, 0, 0.25),
+        inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+        1px 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Right Arm */
+.customer-figure::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 18px;
+    background:
+        /* Arm highlight */
+        radial-gradient(ellipse at 30% 20%, rgba(255, 228, 196, 0.3) 0%, transparent 50%),
+        /* Main arm color */
+        linear-gradient(180deg, currentColor 0%, currentColor 100%);
+    border-radius: 3px;
+    top: 40px;
+    right: 4px;
+    box-shadow:
+        inset -1px 0 2px rgba(0, 0, 0, 0.3),
+        inset 1px 0 2px rgba(255, 255, 255, 0.2),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+    transform: rotateZ(15deg);
+    transform-origin: top;
+    animation: rightArmSway 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes leftArmSway {
+    0%, 100% {
+        transform: rotateZ(-15deg);
+    }
+    50% {
+        transform: rotateZ(-20deg);
+    }
+}
+
+@keyframes rightArmSway {
+    0%, 100% {
+        transform: rotateZ(15deg);
+    }
+    50% {
+        transform: rotateZ(20deg);
+    }
 }
 
 .customer-legs-wrapper {
@@ -2028,14 +2383,39 @@ body {
 }
 
 .customer-leg {
-    width: 10px;
-    height: 16px;
-    background: linear-gradient(135deg, #3d566e 0%, #2c3e50 80%, #1a252f 100%);
-    border-radius: 5px 5px 2px 2px;
+    width: 11px;
+    height: 18px;
+    background:
+        /* 3D cylindrical leg effect */
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
+        linear-gradient(135deg, #3d566e 0%, #2c3e50 50%, #1a252f 90%, #0d1419 100%);
+    border-radius: 6px 6px 3px 3px;
     box-shadow:
-        inset -2px 0 3px rgba(0, 0, 0, 0.4),
-        inset 1px 0 2px rgba(255, 255, 255, 0.1),
-        2px 3px 5px rgba(0, 0, 0, 0.4);
+        /* 3D depth */
+        inset -3px 0 5px rgba(0, 0, 0, 0.5),
+        inset 3px 0 4px rgba(255, 255, 255, 0.15),
+        inset 0 2px 3px rgba(255, 255, 255, 0.1),
+        /* Ground shadow */
+        2px 4px 8px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: legSway 2s ease-in-out infinite;
+}
+
+@keyframes legSway {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-1px) rotate(1deg);
+    }
+}
+
+.customer-leg:first-child {
+    animation-delay: 0s;
+}
+
+.customer-leg:last-child {
+    animation-delay: 1s;
 }
 
 .customer-leg::after {
@@ -2044,9 +2424,14 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(135deg, #1a252f 0%, #0d1419 100%);
-    border-radius: 0 0 2px 2px;
+    height: 5px;
+    background:
+        radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #1a252f 0%, #0d1419 100%);
+    border-radius: 0 0 3px 3px;
+    box-shadow:
+        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .customer-order {
@@ -2166,6 +2551,43 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
     filter: grayscale(1);
+}
+
+/* Clean Table Button - Restaurant City Style */
+.clean-table-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    transition: all 0.3s ease;
+    border: 2px solid white;
+    margin-top: 8px;
+    animation: cleanPulse 2s ease-in-out infinite;
+}
+
+@keyframes cleanPulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 6px 20px rgba(255, 152, 0, 0.6),
+                    0 0 25px rgba(255, 152, 0, 0.4);
+    }
+}
+
+.clean-table-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.7),
+                0 0 30px rgba(255, 152, 0, 0.5);
+}
+
+.clean-table-btn:active {
+    transform: scale(1.05);
 }
 
 /* Kitchen Area */
@@ -2951,59 +3373,123 @@ body {
 
 .storage-table {
     position: relative;
-    background:
-        /* Wood grain texture */
-        repeating-linear-gradient(
-            90deg,
-            transparent 0px,
-            transparent 12px,
-            rgba(139, 90, 60, 0.05) 12px,
-            rgba(139, 90, 60, 0.05) 13px
-        ),
-        /* Main wood color */
-        linear-gradient(135deg, #e6b886 0%, #d9a066 30%, #c4935e 100%);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow:
-        0 12px 30px rgba(0, 0, 0, 0.3),
-        inset 0 2px 8px rgba(255, 255, 255, 0.4),
-        inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+    background: transparent;
     transform-style: preserve-3d;
-    transition: all 0.3s ease;
-    border: 4px solid #a0724e;
+    perspective: 800px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     min-height: 200px;
+    padding: 20px;
+    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.45));
 }
 
 .storage-table:hover {
-    transform: translateY(-8px) scale(1.03);
-    box-shadow:
-        0 18px 40px rgba(0, 0, 0, 0.4),
-        inset 0 2px 8px rgba(255, 255, 255, 0.4),
-        inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-10px) scale(1.04);
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.55));
 }
 
+/* 3D Table Top - Isometric like dining tables */
 .storage-table-top {
     position: absolute;
-    top: -8px;
-    left: 5px;
-    right: 5px;
-    height: 15px;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%) rotateX(60deg) rotateZ(45deg);
+    width: 160px;
+    height: 160px;
     background:
-        linear-gradient(90deg,
-            #8b5a3c 0%,
-            #a0724e 30%,
-            #b58353 50%,
-            #a0724e 70%,
-            #8b5a3c 100%
+        /* Enhanced wood grain */
+        repeating-linear-gradient(
+            88deg,
+            transparent 0px,
+            transparent 18px,
+            rgba(139, 90, 60, 0.12) 18px,
+            rgba(139, 90, 60, 0.12) 19px,
+            transparent 19px,
+            transparent 22px
+        ),
+        repeating-linear-gradient(
+            92deg,
+            transparent 0px,
+            transparent 12px,
+            rgba(139, 90, 60, 0.08) 12px,
+            rgba(139, 90, 60, 0.08) 13px,
+            transparent 13px,
+            transparent 25px
+        ),
+        /* Wood knots */
+        radial-gradient(circle at 25% 30%, rgba(139, 90, 60, 0.2) 0%, transparent 8%),
+        radial-gradient(circle at 75% 65%, rgba(139, 90, 60, 0.15) 0%, transparent 10%),
+        /* Main wood color with 3D depth */
+        radial-gradient(
+            ellipse at 55% 35%,
+            #f0c896 0%,
+            #e6b886 15%,
+            #d9a066 30%,
+            #d4a574 50%,
+            #c4935e 75%,
+            #b58353 100%
         );
-    border-radius: 15px 15px 0 0;
+    border-radius: 20px;
     box-shadow:
-        0 -3px 10px rgba(0, 0, 0, 0.3),
-        inset 0 2px 6px rgba(255, 255, 255, 0.3),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-    transform: rotateX(50deg);
-    transform-origin: bottom;
+        /* Strong 3D shadows */
+        0 18px 40px rgba(0, 0, 0, 0.5),
+        inset 0 5px 20px rgba(255, 255, 255, 0.6),
+        inset 0 -5px 18px rgba(0, 0, 0, 0.5),
+        inset -5px 0 15px rgba(0, 0, 0, 0.35),
+        inset 5px 0 15px rgba(255, 255, 255, 0.35),
+        /* Border glow */
+        0 0 0 3px rgba(160, 114, 78, 1),
+        0 0 10px rgba(255, 193, 7, 0.25);
+    border: 6px solid #a0724e;
+    z-index: 2;
+    animation: storageTableShine 10s ease-in-out infinite;
+}
+
+@keyframes storageTableShine {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.08);
+    }
+}
+
+/* 3D Table Base - Add legs like dining tables */
+.storage-table::before,
+.storage-table::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 70px;
+    background:
+        radial-gradient(ellipse at 30% 30%, rgba(139, 90, 60, 0.4) 0%, transparent 50%),
+        linear-gradient(90deg,
+            #3d2514 0%,
+            #4a3422 10%,
+            #6d4628 20%,
+            #8b5a3c 50%,
+            #6d4628 80%,
+            #4a3422 90%,
+            #3d2514 100%
+        );
+    border-radius: 5px;
+    box-shadow:
+        inset -4px 0 10px rgba(0, 0, 0, 0.6),
+        inset 4px 0 8px rgba(139, 90, 60, 0.5),
+        inset 0 3px 6px rgba(255, 255, 255, 0.2),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+        5px 8px 15px rgba(0, 0, 0, 0.65);
+    top: 60px;
     z-index: 1;
+}
+
+.storage-table::before {
+    left: 30%;
+    transform: translateX(-50%) perspective(700px) rotateY(-12deg) rotateX(3deg);
+}
+
+.storage-table::after {
+    right: 30%;
+    transform: translateX(50%) perspective(700px) rotateY(12deg) rotateX(3deg);
 }
 
 .storage-label {
