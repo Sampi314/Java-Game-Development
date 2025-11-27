@@ -500,6 +500,9 @@ function hasFoodInStorage(foodType) {
 
 // Storage Tables Management
 function updateStorageTablesUI() {
+    // Update quick food counter (always visible)
+    updateQuickFoodCounter();
+
     gameState.storageTables.forEach((table, index) => {
         const tableElement = document.getElementById(`storage-table-${index}`);
         if (!tableElement) return;
@@ -532,6 +535,43 @@ function updateStorageTablesUI() {
             `;
             foodsContainer.appendChild(div);
         });
+    });
+}
+
+// Update quick food counter (always visible at top of kitchen)
+function updateQuickFoodCounter() {
+    const counterItems = document.getElementById('counterItems');
+    if (!counterItems) return;
+
+    // Count all food across all storage tables
+    const totalFoodCount = {};
+    gameState.storageTables.forEach(table => {
+        table.foods.forEach(food => {
+            totalFoodCount[food] = (totalFoodCount[food] || 0) + 1;
+        });
+    });
+
+    // Also count inventory food
+    gameState.inventory.forEach(food => {
+        totalFoodCount[food] = (totalFoodCount[food] || 0) + 1;
+    });
+
+    counterItems.innerHTML = '';
+
+    if (Object.keys(totalFoodCount).length === 0) {
+        counterItems.innerHTML = '<div class="counter-placeholder">Cook food to see it here!</div>';
+        return;
+    }
+
+    // Display total food counts
+    Object.keys(totalFoodCount).forEach(foodType => {
+        const div = document.createElement('div');
+        div.className = 'counter-food-item';
+        div.innerHTML = `
+            ${get3DFoodHTML(foodType)}
+            <span class="counter-food-count">×${totalFoodCount[foodType]}</span>
+        `;
+        counterItems.appendChild(div);
     });
 }
 
