@@ -745,8 +745,25 @@ function spawnCustomer() {
         return; // No empty tables
     }
 
-    const foodTypes = Object.keys(foodData);
-    const randomFood = foodTypes[Math.floor(Math.random() * foodTypes.length)];
+    // Get available food types from storage tables
+    const availableFoods = new Set();
+    gameState.storageTables.forEach(table => {
+        table.foods.forEach(food => availableFoods.add(food));
+    });
+
+    // Also check inventory as fallback
+    gameState.inventory.forEach(food => availableFoods.add(food));
+
+    // Convert to array
+    const availableFoodTypes = Array.from(availableFoods);
+
+    // Don't spawn customer if no food is available
+    if (availableFoodTypes.length === 0) {
+        return;
+    }
+
+    // Pick random food from available foods
+    const randomFood = availableFoodTypes[Math.floor(Math.random() * availableFoodTypes.length)];
     const randomShirtColor = customerShirtColors[Math.floor(Math.random() * customerShirtColors.length)];
 
     const customer = {
