@@ -282,10 +282,10 @@ body {
     overflow: visible;
     border: 5px solid #4a2f1a;
     transform-style: preserve-3d;
-    /* TRUE 2.5D ISOMETRIC PERSPECTIVE - Restaurant City Style */
+    /* TRUE 2.5D ISOMETRIC PARALLELOGRAM/RHOMBUS - Restaurant City Style */
     perspective: 1500px;
-    perspective-origin: 50% 30%;
-    transform: rotateX(8deg) rotateY(0deg) scale(1.05);
+    perspective-origin: 50% 50%;
+    transform: rotateX(55deg) rotateZ(45deg) scale(1.2);
     transform-origin: center center;
     animation: floorGleam 12s ease-in-out infinite;
 }
@@ -2551,6 +2551,43 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
     filter: grayscale(1);
+}
+
+/* Clean Table Button - Restaurant City Style */
+.clean-table-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    transition: all 0.3s ease;
+    border: 2px solid white;
+    margin-top: 8px;
+    animation: cleanPulse 2s ease-in-out infinite;
+}
+
+@keyframes cleanPulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 6px 20px rgba(255, 152, 0, 0.6),
+                    0 0 25px rgba(255, 152, 0, 0.4);
+    }
+}
+
+.clean-table-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.7),
+                0 0 30px rgba(255, 152, 0, 0.5);
+}
+
+.clean-table-btn:active {
+    transform: scale(1.05);
 }
 
 /* Kitchen Area */
