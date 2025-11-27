@@ -6,8 +6,8 @@ const gameState = {
     inventory: [],
     tables: [],
     stations: {
-        1: { unlocked: true, cooking: false, currentFood: null, progress: 0 },
-        2: { unlocked: false, cooking: false, currentFood: null, progress: 0 }
+        1: { unlocked: true, cooking: false, currentFood: null, progress: 0, autoCook: false, autoCookFood: null },
+        2: { unlocked: false, cooking: false, currentFood: null, progress: 0, autoCook: false, autoCookFood: null }
     },
     upgrades: {
         cookingSpeed: 0,
@@ -161,6 +161,47 @@ function setupEventListeners() {
         });
     });
 
+    // Auto-cook toggle
+    document.querySelectorAll('.auto-cook-toggle').forEach(toggle => {
+        toggle.addEventListener('change', (e) => {
+            const stationId = e.currentTarget.dataset.station;
+            const station = gameState.stations[stationId];
+            station.autoCook = e.currentTarget.checked;
+
+            if (station.autoCook) {
+                const select = document.querySelector(`.auto-cook-select[data-station="${stationId}"]`);
+                if (select.value) {
+                    station.autoCookFood = select.value;
+                    // Start cooking if station is idle
+                    if (!station.cooking) {
+                        startCooking(station.autoCookFood, stationId);
+                    }
+                    showNotification(`Auto-cook enabled for ${foodData[select.value].name}!`, 'success');
+                } else {
+                    e.currentTarget.checked = false;
+                    station.autoCook = false;
+                    showNotification('Please select a food first!', 'error');
+                }
+            } else {
+                showNotification('Auto-cook disabled', 'info');
+            }
+        });
+    });
+
+    // Auto-cook food selection
+    document.querySelectorAll('.auto-cook-select').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const stationId = e.currentTarget.dataset.station;
+            const station = gameState.stations[stationId];
+            station.autoCookFood = e.currentTarget.value;
+
+            // If auto-cook is enabled, restart with new food
+            if (station.autoCook && e.currentTarget.value) {
+                showNotification(`Auto-cook updated to ${foodData[e.currentTarget.value].name}`, 'info');
+            }
+        });
+    });
+
     // Upgrade buttons
     document.getElementById('speedUpgrade').addEventListener('click', () => upgradeSpeed());
     document.getElementById('tableUpgrade').addEventListener('click', () => upgradeTable());
@@ -229,17 +270,23 @@ function finishCooking(stationId) {
     serveBtnElement.onclick = () => {
         gameState.inventory.push(station.currentFood);
         updateInventoryUI();
+        updateUI(); // FIX: Update serve buttons when inventory changes
 
         // Reset station
         station.cooking = false;
         station.currentFood = null;
         station.progress = 0;
         progressBar.style.width = '0%';
-        cookingItem.textContent = '';
+        cookingItem.innerHTML = '';
         serveBtnElement.style.display = 'none';
         cookButtons.forEach(btn => btn.disabled = false);
 
-        showNotification(`${food.icon} ${food.name} ready to serve!`, 'success');
+        showNotification(`${food.name} ready to serve!`, 'success');
+
+        // Auto-cook if enabled
+        if (station.autoCook && station.autoCookFood) {
+            setTimeout(() => startCooking(station.autoCookFood, stationId), 500);
+        }
     };
 }
 
@@ -257,6 +304,7 @@ function unlockStation(stationId) {
     const stationElement = document.getElementById(`station${stationId}`);
     stationElement.classList.remove('locked');
     stationElement.querySelector('.unlock-message').style.display = 'none';
+    stationElement.querySelector('.auto-cook-controls').style.display = 'flex';
     stationElement.querySelector('.food-buttons').style.display = 'flex';
 
     updateUI();
@@ -689,16 +737,29 @@ function updateUI() {
     document.getElementById('level').textContent = gameState.level;
     document.getElementById('customersServed').textContent = gameState.customersServed;
 
-    // Update serve buttons based on inventory
+    // Update serve buttons based on inventory - FIX: Update ALL tables
     gameState.tables.forEach(table => {
         if (table.occupied && table.customer) {
-            const hasFood = gameState.inventory.includes(table.customer.order);
-            const btn = document.querySelector(`#table-${table.id} .serve-table-btn`);
-            if (btn) {
-                btn.disabled = !hasFood;
-            }
+            updateTableServeButton(table);
         }
     });
+}
+
+// Helper function to update serve button state
+function updateTableServeButton(table) {
+    const hasFood = gameState.inventory.includes(table.customer.order);
+    const btn = document.querySelector(`#table-${table.id} .serve-table-btn`);
+    if (btn) {
+        btn.disabled = !hasFood;
+        // Add visual feedback
+        if (hasFood) {
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+        } else {
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+        }
+    }
 }
 
 // Notifications
