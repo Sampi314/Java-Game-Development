@@ -218,66 +218,85 @@ body {
 }
 
 .restaurant-floor {
-    /* Restaurant City-style isometric tile floor */
+    /* Restaurant City-style polished tile floor */
     background:
-        /* Diamond/Isometric tile pattern - Restaurant City style */
+        /* Elegant tile pattern with squares */
         repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 35px,
-            rgba(139, 90, 60, 0.3) 35px,
-            rgba(139, 90, 60, 0.3) 37px,
-            transparent 37px,
-            transparent 70px
+            90deg,
+            transparent 0px,
+            transparent 58px,
+            rgba(139, 90, 60, 0.25) 58px,
+            rgba(139, 90, 60, 0.25) 60px,
+            rgba(200, 168, 130, 0.15) 60px,
+            rgba(200, 168, 130, 0.15) 62px,
+            transparent 62px,
+            transparent 120px
         ),
         repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 35px,
-            rgba(139, 90, 60, 0.3) 35px,
-            rgba(139, 90, 60, 0.3) 37px,
-            transparent 37px,
-            transparent 70px
+            0deg,
+            transparent 0px,
+            transparent 58px,
+            rgba(139, 90, 60, 0.25) 58px,
+            rgba(139, 90, 60, 0.25) 60px,
+            rgba(200, 168, 130, 0.15) 60px,
+            rgba(200, 168, 130, 0.15) 62px,
+            transparent 62px,
+            transparent 120px
         ),
-        /* Alternating tile colors for depth */
-        repeating-conic-gradient(
-            from 45deg at 50px 50px,
-            #d4a574 0deg,
-            #d4a574 90deg,
-            #c8a882 90deg,
-            #c8a882 180deg,
-            #d4a574 180deg,
-            #d4a574 270deg,
-            #c8a882 270deg,
-            #c8a882 360deg
+        /* Checkered alternating tiles */
+        repeating-linear-gradient(
+            0deg,
+            #dab68a 0px,
+            #dab68a 60px,
+            #cca876 60px,
+            #cca876 120px
         ),
-        /* Base wooden floor color */
-        linear-gradient(135deg, #d2a679 0%, #c09960 100%);
-    background-size: 100px 100px, 100px 100px, 100px 100px, 100%;
-    background-position: 0 0, 0 0, 0 0, 0 0;
+        repeating-linear-gradient(
+            90deg,
+            #d4b184 0px,
+            #d4b184 60px,
+            #c6a372 60px,
+            #c6a372 120px
+        ),
+        /* Base polished floor color */
+        linear-gradient(135deg, #e8d0a8 0%, #d4b184 25%, #c6a372 50%, #b8956a 75%, #a8845c 100%);
+    background-size: 120px 120px, 120px 120px, 120px 120px, 120px 120px, 100%;
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
     border-radius: 0;
     padding: 40px;
     min-height: 500px;
     box-shadow:
-        /* Restaurant City-style 3D depth shadows */
-        inset 0 8px 40px rgba(0, 0, 0, 0.3),
-        inset 0 -8px 40px rgba(0, 0, 0, 0.2),
-        inset 8px 0 40px rgba(0, 0, 0, 0.15),
-        inset -8px 0 40px rgba(0, 0, 0, 0.15),
+        /* Polished floor highlights */
+        inset 0 10px 50px rgba(0, 0, 0, 0.25),
+        inset 0 -10px 50px rgba(0, 0, 0, 0.15),
+        inset 10px 0 50px rgba(0, 0, 0, 0.12),
+        inset -10px 0 50px rgba(0, 0, 0, 0.12),
+        /* Glossy top shine */
+        inset 0 3px 10px rgba(255, 255, 255, 0.15),
         /* Wall border effect */
-        0 0 0 8px #6b4423,
-        0 0 0 12px #8b5a3c,
+        0 0 0 10px #6b4423,
+        0 0 0 15px #8b5a3c,
         /* Outer shadow for elevation */
-        0 12px 35px rgba(0, 0, 0, 0.4);
+        0 15px 40px rgba(0, 0, 0, 0.45);
     position: relative;
     overflow: visible;
-    border: 4px solid #4a2f1a;
+    border: 5px solid #4a2f1a;
     transform-style: preserve-3d;
     /* TRUE 2.5D ISOMETRIC PERSPECTIVE - Restaurant City Style */
     perspective: 1500px;
     perspective-origin: 50% 30%;
     transform: rotateX(8deg) rotateY(0deg) scale(1.05);
     transform-origin: center center;
+    animation: floorGleam 12s ease-in-out infinite;
+}
+
+@keyframes floorGleam {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.05);
+    }
 }
 
 .restaurant-floor::before {
@@ -403,13 +422,14 @@ body {
 /* Entrance Door - Restaurant City Style */
 .entrance-door {
     position: absolute;
-    top: 20px;
+    top: -280px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
-    height: 160px;
-    z-index: 100;
+    width: 100px;
+    height: 140px;
+    z-index: -1;
     pointer-events: none;
+    opacity: 0;  /* Hidden - we have a wall door already */
 }
 
 .door-frame {
