@@ -222,15 +222,149 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Station 3 -->
+                        <div class="station locked" id="station3" data-unlock-cost="400">
+                            <div class="station-wrapper">
+                                <div class="station-top"></div>
+                                <div class="station-front">
+                                    <div class="station-header">
+                                        <span class="station-icon">🔒</span>
+                                        <span>Station 3</span>
+                                    </div>
+                                    <div class="station-content">
+                                        <div class="unlock-message">
+                                            <p class="unlock-text">Unlock Station</p>
+                                            <p class="unlock-price">$400</p>
+                                            <button class="unlock-btn" data-station="3">
+                                                <span>🔓 Unlock</span>
+                                            </button>
+                                        </div>
+                                        <div class="auto-cook-controls" style="display: none;">
+                                            <label class="auto-cook-label">
+                                                <input type="checkbox" class="auto-cook-toggle" data-station="3">
+                                                <span>Auto-Cook:</span>
+                                            </label>
+                                            <select class="auto-cook-select" data-station="3">
+                                                <option value="">Select Food</option>
+                                                <option value="coffee">☕ Coffee</option>
+                                                <option value="burger">🍔 Burger</option>
+                                                <option value="pizza">🍕 Pizza</option>
+                                            </select>
+                                        </div>
+                                        <div class="food-buttons" style="display: none;">
+                                            <button class="cook-btn" data-food="burger" data-station="3">
+                                                <span class="food-icon">🍔</span>
+                                                <span class="food-name">Burger</span>
+                                                <span class="food-info">5s • $15</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="pizza" data-station="3">
+                                                <span class="food-icon">🍕</span>
+                                                <span class="food-name">Pizza</span>
+                                                <span class="food-info">8s • $25</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="coffee" data-station="3">
+                                                <span class="food-icon">☕</span>
+                                                <span class="food-name">Coffee</span>
+                                                <span class="food-info">3s • $10</span>
+                                            </button>
+                                        </div>
+                                        <div class="cooking-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill"></div>
+                                            </div>
+                                            <div class="cooking-item"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Station 4 -->
+                        <div class="station locked" id="station4" data-unlock-cost="600">
+                            <div class="station-wrapper">
+                                <div class="station-top"></div>
+                                <div class="station-front">
+                                    <div class="station-header">
+                                        <span class="station-icon">🔒</span>
+                                        <span>Station 4</span>
+                                    </div>
+                                    <div class="station-content">
+                                        <div class="unlock-message">
+                                            <p class="unlock-text">Unlock Station</p>
+                                            <p class="unlock-price">$600</p>
+                                            <button class="unlock-btn" data-station="4">
+                                                <span>🔓 Unlock</span>
+                                            </button>
+                                        </div>
+                                        <div class="auto-cook-controls" style="display: none;">
+                                            <label class="auto-cook-label">
+                                                <input type="checkbox" class="auto-cook-toggle" data-station="4">
+                                                <span>Auto-Cook:</span>
+                                            </label>
+                                            <select class="auto-cook-select" data-station="4">
+                                                <option value="">Select Food</option>
+                                                <option value="coffee">☕ Coffee</option>
+                                                <option value="burger">🍔 Burger</option>
+                                                <option value="pizza">🍕 Pizza</option>
+                                            </select>
+                                        </div>
+                                        <div class="food-buttons" style="display: none;">
+                                            <button class="cook-btn" data-food="burger" data-station="4">
+                                                <span class="food-icon">🍔</span>
+                                                <span class="food-name">Burger</span>
+                                                <span class="food-info">5s • $15</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="pizza" data-station="4">
+                                                <span class="food-icon">🍕</span>
+                                                <span class="food-name">Pizza</span>
+                                                <span class="food-info">8s • $25</span>
+                                            </button>
+                                            <button class="cook-btn" data-food="coffee" data-station="4">
+                                                <span class="food-icon">☕</span>
+                                                <span class="food-name">Coffee</span>
+                                                <span class="food-info">3s • $10</span>
+                                            </button>
+                                        </div>
+                                        <div class="cooking-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill"></div>
+                                            </div>
+                                            <div class="cooking-item"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="food-inventory">
-                        <div class="inventory-header">
-                            <span class="inventory-icon">🍽️</span>
-                            <span>Ready to Serve</span>
+                    <!-- Food Storage Tables -->
+                    <div class="food-storage-area">
+                        <div class="storage-header">
+                            <span class="storage-icon">📦</span>
+                            <span>Food Storage</span>
                         </div>
-                        <div id="inventory" class="inventory-items">
-                            <div class="inventory-placeholder">Cook food to fill your tray!</div>
+                        <div class="storage-tables-container">
+                            <div class="storage-table" id="storage-table-0">
+                                <div class="storage-table-top"></div>
+                                <div class="storage-label">Table 1</div>
+                                <div class="storage-foods">
+                                    <div class="storage-placeholder">Empty</div>
+                                </div>
+                            </div>
+                            <div class="storage-table" id="storage-table-1">
+                                <div class="storage-table-top"></div>
+                                <div class="storage-label">Table 2</div>
+                                <div class="storage-foods">
+                                    <div class="storage-placeholder">Empty</div>
+                                </div>
+                            </div>
+                            <div class="storage-table" id="storage-table-2">
+                                <div class="storage-table-top"></div>
+                                <div class="storage-label">Table 3</div>
+                                <div class="storage-foods">
+                                    <div class="storage-placeholder">Empty</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

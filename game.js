@@ -3,8 +3,13 @@ const gameState = {
     money: 100,
     level: 1,
     customersServed: 0,
-    inventory: [],
+    inventory: [], // Keep for backwards compatibility but will use storage tables
     tables: [],
+    storageTables: [
+        { id: 0, foods: [] },
+        { id: 1, foods: [] },
+        { id: 2, foods: [] }
+    ],
     stations: {
         1: {
             unlocked: true,
@@ -25,6 +30,26 @@ const gameState = {
             ],
             autoCook: false,
             autoCookFood: null
+        },
+        3: {
+            unlocked: false,
+            cookingSlots: [
+                { cooking: false, currentFood: null, progress: 0, intervalId: null },
+                { cooking: false, currentFood: null, progress: 0, intervalId: null },
+                { cooking: false, currentFood: null, progress: 0, intervalId: null }
+            ],
+            autoCook: false,
+            autoCookFood: null
+        },
+        4: {
+            unlocked: false,
+            cookingSlots: [
+                { cooking: false, currentFood: null, progress: 0, intervalId: null },
+                { cooking: false, currentFood: null, progress: 0, intervalId: null },
+                { cooking: false, currentFood: null, progress: 0, intervalId: null }
+            ],
+            autoCook: false,
+            autoCookFood: null
         }
     },
     upgrades: {
@@ -37,8 +62,9 @@ const gameState = {
     waiter: {
         position: { x: 50, y: 50 },
         currentFood: null,
-        status: 'idle', // idle, moving_to_table, serving, moving_to_kitchen
+        status: 'idle', // idle, moving_to_table, serving, moving_to_kitchen, moving_to_storage
         targetTable: null,
+        targetStorage: null,
         servingQueue: []
     },
     autoServe: false
@@ -305,14 +331,22 @@ function finishCooking(stationId, slotIndex) {
     const slot = station.cookingSlots[slotIndex];
     const food = foodData[slot.currentFood];
 
-    // Automatically add to inventory
-    gameState.inventory.push(slot.currentFood);
-    updateInventoryUI();
-    updateUI(); // Update serve buttons when inventory changes
+    // Add to storage table (round robin distribution)
+    const storageTable = findAvailableStorageTable();
+    if (storageTable) {
+        storageTable.foods.push(slot.currentFood);
+        updateStorageTablesUI();
+    } else {
+        // Fallback to inventory if storage is full
+        gameState.inventory.push(slot.currentFood);
+        updateInventoryUI();
+    }
+
+    updateUI(); // Update serve buttons when food changes
 
     // Only show notification if not auto-cooking
     if (!station.autoCook) {
-        showNotification(`${food.name} ready to serve!`, 'success');
+        showNotification(`${food.name} placed on storage table!`, 'success');
     }
 
     // Store the cooked food type before resetting
@@ -329,6 +363,18 @@ function finishCooking(stationId, slotIndex) {
     if (station.autoCook && station.autoCookFood) {
         setTimeout(() => startCooking(station.autoCookFood, stationId), 300);
     }
+}
+
+// Find storage table with least food (load balancing)
+function findAvailableStorageTable() {
+    let minTable = gameState.storageTables[0];
+    gameState.storageTables.forEach(table => {
+        if (table.foods.length < minTable.foods.length) {
+            minTable = table;
+        }
+    });
+    // Limit 10 items per storage table
+    return minTable.foods.length < 10 ? minTable : null;
 }
 
 // Update station UI to show all cooking slots
@@ -369,7 +415,8 @@ function updateStationUI(stationId) {
 }
 
 function unlockStation(stationId) {
-    const cost = 200;
+    const stationElement = document.getElementById(`station${stationId}`);
+    const cost = parseInt(stationElement.dataset.unlockCost) || 200;
 
     if (gameState.money < cost) {
         showNotification('Not enough money!', 'error');
@@ -378,8 +425,6 @@ function unlockStation(stationId) {
 
     gameState.money -= cost;
     gameState.stations[stationId].unlocked = true;
-
-    const stationElement = document.getElementById(`station${stationId}`);
     stationElement.classList.remove('locked');
 
     const unlockMessage = stationElement.querySelector('.unlock-message');
@@ -417,11 +462,11 @@ setInterval(() => {
 }, 1000);
 
 function autoServeCustomers() {
-    // Find customers whose orders are available in inventory
+    // Find customers whose orders are available in storage tables
     gameState.tables.forEach(table => {
         if (table.occupied && table.customer) {
             const customer = table.customer;
-            const hasFood = gameState.inventory.includes(customer.order);
+            const hasFood = hasFoodInStorage(customer.order);
 
             // Check if this table is already in serving queue
             const alreadyQueued = gameState.waiter.servingQueue.some(task => task.tableId === table.id);
@@ -442,29 +487,58 @@ function autoServeCustomers() {
     }
 }
 
-// Inventory Management
-function updateInventoryUI() {
-    const inventoryElement = document.getElementById('inventory');
-    inventoryElement.innerHTML = '';
-
-    if (gameState.inventory.length === 0) {
-        inventoryElement.innerHTML = '<div class="inventory-placeholder">Cook food to fill your tray!</div>';
-        return;
+// Check if food is available in storage tables
+function hasFoodInStorage(foodType) {
+    for (const table of gameState.storageTables) {
+        if (table.foods.includes(foodType)) {
+            return true;
+        }
     }
+    // Also check inventory as fallback
+    return gameState.inventory.includes(foodType);
+}
 
-    const foodCount = {};
-    gameState.inventory.forEach(food => {
-        foodCount[food] = (foodCount[food] || 0) + 1;
-    });
+// Storage Tables Management
+function updateStorageTablesUI() {
+    gameState.storageTables.forEach((table, index) => {
+        const tableElement = document.getElementById(`storage-table-${index}`);
+        if (!tableElement) return;
 
-    Object.keys(foodCount).forEach(foodType => {
-        const food = foodData[foodType];
-        const div = document.createElement('div');
-        div.className = 'inventory-item';
-        div.innerHTML = `${get3DFoodHTML(foodType)} <span class="food-count">x${foodCount[foodType]}</span>`;
-        div.title = `Click to serve ${food.name}`;
-        inventoryElement.appendChild(div);
+        const foodsContainer = tableElement.querySelector('.storage-foods');
+        if (!foodsContainer) return;
+
+        foodsContainer.innerHTML = '';
+
+        if (table.foods.length === 0) {
+            foodsContainer.innerHTML = '<div class="storage-placeholder">Empty</div>';
+            return;
+        }
+
+        // Count foods
+        const foodCount = {};
+        table.foods.forEach(food => {
+            foodCount[food] = (foodCount[food] || 0) + 1;
+        });
+
+        // Display food counts
+        Object.keys(foodCount).forEach(foodType => {
+            const div = document.createElement('div');
+            div.className = 'storage-food-item';
+            div.innerHTML = `
+                <div style="transform: scale(0.5); display: inline-block;">
+                    ${get3DFoodHTML(foodType)}
+                </div>
+                <span class="food-count">x${foodCount[foodType]}</span>
+            `;
+            foodsContainer.appendChild(div);
+        });
     });
+}
+
+// Inventory Management (kept for backwards compatibility)
+function updateInventoryUI() {
+    // Update storage tables instead
+    updateStorageTablesUI();
 }
 
 // Waiter Movement System
@@ -539,12 +613,26 @@ function processServingQueue() {
     // Get next serving task
     const nextTask = gameState.waiter.servingQueue.shift();
 
-    // Check if we still have the food
-    const foodIndex = gameState.inventory.indexOf(nextTask.foodType);
-    if (foodIndex === -1) {
-        // Food not available, check next task
-        processServingQueue();
-        return;
+    // Find which storage table has the food
+    let storageTable = null;
+    let foodIndex = -1;
+
+    for (const table of gameState.storageTables) {
+        foodIndex = table.foods.indexOf(nextTask.foodType);
+        if (foodIndex !== -1) {
+            storageTable = table;
+            break;
+        }
+    }
+
+    // If not in storage, check inventory (fallback)
+    if (!storageTable) {
+        foodIndex = gameState.inventory.indexOf(nextTask.foodType);
+        if (foodIndex === -1) {
+            // Food not available, check next task
+            processServingQueue();
+            return;
+        }
     }
 
     // Check if customer is still at table
@@ -555,26 +643,40 @@ function processServingQueue() {
         return;
     }
 
-    // Remove food from inventory
-    gameState.inventory.splice(foodIndex, 1);
-    updateInventoryUI();
-
     // Set waiter state
-    gameState.waiter.status = 'moving_to_table';
+    gameState.waiter.status = 'moving_to_storage';
     gameState.waiter.currentFood = nextTask.foodType;
     gameState.waiter.targetTable = nextTask.tableId;
-    updateWaiterTray();
+    gameState.waiter.targetStorage = storageTable ? storageTable.id : null;
 
-    // Move to kitchen first to pick up food
-    moveWaiterTo(80, 30, () => {
+    // Move to storage table first to pick up food
+    const storagePos = getStorageTablePosition(storageTable ? storageTable.id : 0);
+    moveWaiterTo(storagePos.x, storagePos.y, () => {
+        // Remove food from storage table or inventory
+        if (storageTable) {
+            storageTable.foods.splice(foodIndex, 1);
+            updateStorageTablesUI();
+        } else {
+            gameState.inventory.splice(foodIndex, 1);
+        }
+
+        updateWaiterTray();
         showNotification(`Waiter picked up ${foodData[nextTask.foodType].name}!`, 'info');
 
-        // Then move to table
+        // Change status and move to customer table
+        gameState.waiter.status = 'moving_to_table';
         const tablePos = getTablePosition(nextTask.tableId);
         moveWaiterTo(tablePos.x, tablePos.y, () => {
             serveCustomerByWaiter(nextTask.tableId);
         });
     });
+}
+
+function getStorageTablePosition(storageId) {
+    // Position storage tables in the kitchen area
+    const baseX = 75;
+    const baseY = 15 + (storageId * 15);
+    return { x: baseX, y: baseY };
 }
 
 function serveCustomerByWaiter(tableId) {
@@ -878,7 +980,7 @@ function updateUI() {
 
 // Helper function to update serve button state
 function updateTableServeButton(table) {
-    const hasFood = gameState.inventory.includes(table.customer.order);
+    const hasFood = hasFoodInStorage(table.customer.order);
     const btn = document.querySelector(`#table-${table.id} .serve-table-btn`);
     if (btn) {
         btn.disabled = !hasFood;
