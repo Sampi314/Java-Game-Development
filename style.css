@@ -1270,6 +1270,28 @@ body {
     padding: 20px;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    max-height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Custom scrollbar for kitchen area */
+.kitchen-area::-webkit-scrollbar {
+    width: 10px;
+}
+
+.kitchen-area::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.kitchen-area::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+}
+
+.kitchen-area::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
 .cooking-stations {
