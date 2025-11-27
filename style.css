@@ -19,7 +19,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Restaurant City - Bright, cheerful background */
+    background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 50%, #B0E2FF 100%);
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -124,15 +125,32 @@ body {
 }
 
 .game-content {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     margin-bottom: 20px;
 }
 
+/* Restaurant City Style - Full screen restaurant view */
+.restaurant-area {
+    flex: 1;
+    width: 100%;
+    min-height: 600px;
+}
+
+/* Kitchen area - minimized/bottom panel style */
+.kitchen-area {
+    max-height: 250px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
 @media (max-width: 1024px) {
     .game-content {
-        grid-template-columns: 1fr;
+        flex-direction: column;
     }
 }
 
@@ -218,76 +236,34 @@ body {
 }
 
 .restaurant-floor {
-    /* Restaurant City-style polished tile floor */
+    /* Restaurant City - Simple, bright, cheerful floor */
     background:
-        /* Elegant tile pattern with squares */
-        repeating-linear-gradient(
-            90deg,
-            transparent 0px,
-            transparent 58px,
-            rgba(139, 90, 60, 0.25) 58px,
-            rgba(139, 90, 60, 0.25) 60px,
-            rgba(200, 168, 130, 0.15) 60px,
-            rgba(200, 168, 130, 0.15) 62px,
-            transparent 62px,
-            transparent 120px
-        ),
-        repeating-linear-gradient(
-            0deg,
-            transparent 0px,
-            transparent 58px,
-            rgba(139, 90, 60, 0.25) 58px,
-            rgba(139, 90, 60, 0.25) 60px,
-            rgba(200, 168, 130, 0.15) 60px,
-            rgba(200, 168, 130, 0.15) 62px,
-            transparent 62px,
-            transparent 120px
-        ),
-        /* Checkered alternating tiles */
-        repeating-linear-gradient(
-            0deg,
-            #dab68a 0px,
-            #dab68a 60px,
-            #cca876 60px,
-            #cca876 120px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            #d4b184 0px,
-            #d4b184 60px,
-            #c6a372 60px,
-            #c6a372 120px
-        ),
-        /* Base polished floor color */
-        linear-gradient(135deg, #e8d0a8 0%, #d4b184 25%, #c6a372 50%, #b8956a 75%, #a8845c 100%);
-    background-size: 120px 120px, 120px 120px, 120px 120px, 120px 120px, 100%;
-    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
-    border-radius: 0;
-    padding: 40px;
-    min-height: 500px;
+        /* Simple checkered pattern */
+        repeating-conic-gradient(
+            from 0deg at 50px 50px,
+            #f5e6d3 0deg 90deg,
+            #ead5bd 90deg 180deg,
+            #f5e6d3 180deg 270deg,
+            #ead5bd 270deg 360deg
+        );
+    background-size: 100px 100px;
+    background-position: 0 0;
+    border-radius: 10px;
+    padding: 60px;
+    min-height: 550px;
     box-shadow:
-        /* Polished floor highlights */
-        inset 0 10px 50px rgba(0, 0, 0, 0.25),
-        inset 0 -10px 50px rgba(0, 0, 0, 0.15),
-        inset 10px 0 50px rgba(0, 0, 0, 0.12),
-        inset -10px 0 50px rgba(0, 0, 0, 0.12),
-        /* Glossy top shine */
-        inset 0 3px 10px rgba(255, 255, 255, 0.15),
-        /* Wall border effect */
-        0 0 0 10px #6b4423,
-        0 0 0 15px #8b5a3c,
-        /* Outer shadow for elevation */
-        0 15px 40px rgba(0, 0, 0, 0.45);
+        /* Simple, clean shadow */
+        inset 0 2px 10px rgba(0, 0, 0, 0.08),
+        0 4px 20px rgba(0, 0, 0, 0.15);
     position: relative;
     overflow: visible;
-    border: 5px solid #4a2f1a;
+    border: 8px solid #b8956a;
     transform-style: preserve-3d;
-    /* TRUE 2.5D ISOMETRIC PARALLELOGRAM/RHOMBUS - Restaurant City Style */
-    perspective: 1500px;
-    perspective-origin: 50% 50%;
-    transform: rotateX(55deg) rotateZ(45deg) scale(1.2);
+    /* Restaurant City Style - Gentle top-down view */
+    perspective: 2000px;
+    perspective-origin: 50% 30%;
+    transform: rotateX(8deg) scale(1);
     transform-origin: center center;
-    animation: floorGleam 12s ease-in-out infinite;
 }
 
 @keyframes floorGleam {

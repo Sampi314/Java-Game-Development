@@ -1790,6 +1790,106 @@ function updateRecipeBookStats() {
 }
 
 // ================================
+// BUILD SHOP SYSTEM
+// ================================
+
+/**
+ * Toggle Build Shop modal visibility
+ */
+function toggleBuildShop() {
+    const modal = document.getElementById('buildShopModal');
+    if (!modal) return;
+
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        // Show modal
+        modal.style.display = 'flex';
+        renderBuildShop();
+
+        // Add animation class
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    } else {
+        // Hide modal with fade out
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+/**
+ * Show specific category in Build Shop
+ */
+function showCategory(category) {
+    // Update active button
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Render items for this category
+    renderBuildShop(category);
+}
+
+/**
+ * Render Build Shop items
+ */
+function renderBuildShop(category = 'furniture') {
+    const container = document.getElementById('buildShopItems');
+    if (!container) return;
+
+    const shopItems = {
+        furniture: [
+            { id: 'table', name: 'Dining Table', icon: '🪑', price: 100, description: 'A table for customers' },
+            { id: 'chair', name: 'Chair', icon: '💺', price: 25, description: 'Seat for customers' },
+            { id: 'decoration', name: 'Plant', icon: '🌿', price: 50, description: 'Decorative plant' }
+        ],
+        equipment: [
+            { id: 'stove', name: 'Cooking Stove', icon: '🍳', price: 200, description: 'Extra cooking station' },
+            { id: 'fridge', name: 'Refrigerator', icon: '🧊', price: 150, description: 'Food storage' }
+        ],
+        decorations: [
+            { id: 'painting', name: 'Wall Art', icon: '🖼️', price: 75, description: 'Beautiful decoration' },
+            { id: 'lamp', name: 'Lamp', icon: '💡', price: 60, description: 'Ambient lighting' },
+            { id: 'rug', name: 'Floor Rug', icon: '🟫', price: 80, description: 'Cozy floor covering' }
+        ]
+    };
+
+    const items = shopItems[category] || shopItems.furniture;
+
+    container.innerHTML = items.map(item => `
+        <div class="shop-item">
+            <div class="shop-item-icon">${item.icon}</div>
+            <div class="shop-item-name">${item.name}</div>
+            <div class="shop-item-description">${item.description}</div>
+            <div class="shop-item-price">$${item.price}</div>
+            <button class="shop-buy-btn" onclick="buyShopItem('${item.id}', ${item.price})" ${gameState.money < item.price ? 'disabled' : ''}>
+                Buy
+            </button>
+        </div>
+    `).join('');
+}
+
+/**
+ * Buy item from shop (placeholder - to be implemented)
+ */
+function buyShopItem(itemId, price) {
+    if (gameState.money < price) {
+        showNotification('Not enough money!', 'error');
+        return;
+    }
+
+    // For now, just deduct money and show notification
+    // TODO: Implement actual item placement system
+    gameState.money -= price;
+    showNotification(`Purchased ${itemId}! (Placement system coming soon)`, 'success');
+    updateUI();
+    renderBuildShop();
+    saveGame();
+}
+
+// ================================
 // STAFF MANAGEMENT SYSTEM
 // ================================
 
