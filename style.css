@@ -163,11 +163,24 @@ body {
 
 .restaurant-floor {
     background:
-        linear-gradient(90deg, rgba(139, 90, 60, 0.3) 1px, transparent 1px),
-        linear-gradient(rgba(139, 90, 60, 0.3) 1px, transparent 1px),
-        linear-gradient(135deg, #c8a882 0%, #d4a574 25%, #c8a882 50%, #d4a574 75%, #c8a882 100%);
-    background-size: 60px 60px, 60px 60px, 100% 100%;
-    background-position: -1px -1px, -1px -1px, 0 0;
+        linear-gradient(90deg, #8b5a3c 2px, transparent 2px),
+        linear-gradient(#8b5a3c 2px, transparent 2px),
+        repeating-linear-gradient(
+            0deg,
+            #d4a574 0px,
+            #d4a574 60px,
+            #c8a882 60px,
+            #c8a882 120px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            #d4a574 0px,
+            #d4a574 60px,
+            #c8a882 60px,
+            #c8a882 120px
+        );
+    background-size: 60px 60px, 60px 60px, 120px 120px, 120px 120px;
+    background-position: 0 0, 0 0, 0 0, 0 0;
     border-radius: 15px;
     padding: 30px;
     min-height: 500px;
