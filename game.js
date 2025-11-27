@@ -728,10 +728,20 @@ function processServingQueue() {
 }
 
 function getStorageTablePosition(storageId) {
-    // Position storage tables in the kitchen area
-    const baseX = 75;
-    const baseY = 15 + (storageId * 15);
-    return { x: baseX, y: baseY };
+    // Get actual position of storage table on restaurant floor
+    const storageElement = document.getElementById(`storage-table-${storageId}`);
+    if (!storageElement) return { x: 20, y: 30 + (storageId * 20) };
+
+    const container = document.querySelector('.restaurant-floor');
+    if (!container) return { x: 20, y: 30 + (storageId * 20) };
+
+    const containerRect = container.getBoundingClientRect();
+    const storageRect = storageElement.getBoundingClientRect();
+
+    const x = ((storageRect.left - containerRect.left + storageRect.width / 2) / containerRect.width) * 100;
+    const y = ((storageRect.top - containerRect.top + storageRect.height / 2) / containerRect.height) * 100;
+
+    return { x, y };
 }
 
 function serveCustomerByWaiter(tableId) {
