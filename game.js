@@ -990,15 +990,75 @@ function serveCustomerByWaiter(tableId) {
     updateUI();
     saveGame();
 
-    // Process next item in queue or clean dirty tables
+    // Process next item in queue or clean dirty tables (servers can also clean!)
     setTimeout(() => {
         if (gameState.waiter.servingQueue.length > 0) {
             processServingQueue();
         } else if (gameState.dirtyTables.length > 0) {
-            cleanNextDirtyTable();
+            serverCleansDirtyTable();
         }
     }, 500);
 }
+
+// ================================
+// SERVER CLEANING PLATES
+// ================================
+
+/**
+ * Servers can clean dirty tables after serving
+ */
+function serverCleansDirtyTable() {
+    const servers = gameState.staff.filter(s => s.role === 'server' && s.status === 'idle');
+
+    if (servers.length === 0 || gameState.dirtyTables.length === 0) return;
+
+    const server = servers[0];
+    const tableId = gameState.dirtyTables.shift();
+    const table = gameState.tables[tableId];
+
+    if (!table || !table.dirtyPlate) {
+        // Table already clean, check next
+        if (gameState.dirtyTables.length > 0) {
+            serverCleansDirtyTable();
+        }
+        return;
+    }
+
+    server.status = 'cleaning_plate';
+    const tablePos = getTablePosition(tableId);
+
+    showNotification('Server cleaning table...', 'info');
+
+    moveStaffTo(server, tablePos.x, tablePos.y, () => {
+        // Clean the table and pick up dirty plate
+        table.dirtyPlate = false;
+        table.plateFood = null;
+        updateTableUI(table);
+
+        showNotification('Table cleaned by server! ✨', 'success');
+
+        // Reset server
+        server.status = 'idle';
+
+        // Continue with next task
+        setTimeout(() => {
+            if (server.servingQueue && server.servingQueue.length > 0) {
+                processServingQueue();
+            } else if (gameState.dirtyTables.length > 0) {
+                serverCleansDirtyTable();
+            }
+        }, 500);
+    });
+}
+
+// Auto-clean dirty tables with servers periodically
+setInterval(() => {
+    // Only if there are idle servers and dirty tables
+    const idleServers = gameState.staff.filter(s => s.role === 'server' && s.status === 'idle');
+    if (idleServers.length > 0 && gameState.dirtyTables.length > 0) {
+        serverCleansDirtyTable();
+    }
+}, 2000);
 
 // Customer System
 function startCustomerSpawning() {
@@ -1728,6 +1788,322 @@ function updateRecipeBookStats() {
         currentLevelEl.textContent = gameState.level;
     }
 }
+
+// ================================
+// STAFF MANAGEMENT SYSTEM
+// ================================
+
+/**
+ * Toggle Staff Manager modal visibility
+ */
+function toggleStaffManager() {
+    const modal = document.getElementById('staffManagerModal');
+    if (!modal) return;
+
+    if (modal.style.display === 'none' || modal.style.display === '') {
+        // Show modal
+        modal.style.display = 'flex';
+        renderStaffList();
+
+        // Add animation class
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    } else {
+        // Hide modal with fade out
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+/**
+ * Render staff list in the manager
+ */
+function renderStaffList() {
+    const staffList = document.getElementById('staffList');
+    const totalStaffEl = document.getElementById('totalStaff');
+    const activeStaffEl = document.getElementById('activeStaff');
+
+    if (!staffList) return;
+
+    // Update stats
+    const activeStaff = gameState.staff.filter(s => s.status !== 'fired').length;
+    if (totalStaffEl) totalStaffEl.textContent = gameState.staff.length;
+    if (activeStaffEl) activeStaffEl.textContent = activeStaff;
+
+    // Clear list
+    staffList.innerHTML = '';
+
+    // Create staff member cards
+    gameState.staff.forEach(staff => {
+        const roleIcons = {
+            server: '👔',
+            cleaner: '🧹',
+            cook: '👨‍🍳'
+        };
+
+        const statusText = staff.status === 'idle' ? 'Idle' : 'Working';
+        const statusClass = staff.status === 'idle' ? 'status-idle' : 'status-working';
+
+        const card = document.createElement('div');
+        card.className = 'staff-member';
+        card.innerHTML = `
+            <div class="staff-member-icon">${roleIcons[staff.role]}</div>
+            <div class="staff-member-info">
+                <div class="staff-member-name">
+                    ${staff.role.charAt(0).toUpperCase() + staff.role.slice(1)} #${staff.id + 1}
+                </div>
+                <div class="staff-member-role">
+                    <span class="role-badge ${staff.role}">${staff.role}</span>
+                </div>
+            </div>
+            <div class="staff-member-status ${statusClass}">
+                ${statusText}
+            </div>
+            <div class="staff-member-actions">
+                <button class="fire-staff-btn" onclick="fireStaff(${staff.id})" ${gameState.staff.length <= 3 ? 'disabled title="Cannot fire initial staff"' : ''}>
+                    Fire
+                </button>
+            </div>
+        `;
+        staffList.appendChild(card);
+    });
+}
+
+/**
+ * Hire new staff member
+ */
+function hireStaff(role) {
+    const costs = {
+        server: 150,
+        cleaner: 150,
+        cook: 200
+    };
+
+    const cost = costs[role];
+
+    if (gameState.money < cost) {
+        showNotification('Not enough money to hire!', 'error');
+        return;
+    }
+
+    // Deduct money
+    gameState.money -= cost;
+
+    // Create new staff member
+    const newStaff = {
+        id: gameState.staff.length,
+        role: role,
+        position: { x: 100 + (gameState.staff.length * 50), y: 100 },
+        status: 'idle',
+        color: role === 'server' ? '#3498db' : role === 'cleaner' ? '#2ecc71' : '#e74c3c'
+    };
+
+    // Add role-specific properties
+    if (role === 'server') {
+        newStaff.currentFood = null;
+        newStaff.targetTable = null;
+        newStaff.targetStorage = null;
+        newStaff.servingQueue = [];
+    } else if (role === 'cleaner') {
+        newStaff.targetTable = null;
+        newStaff.cleaningQueue = [];
+    } else if (role === 'cook') {
+        newStaff.assignedStation = null;
+        newStaff.cookingQueue = [];
+    }
+
+    gameState.staff.push(newStaff);
+
+    showNotification(`✅ Hired new ${role}!`, 'success');
+    updateUI();
+    renderStaffList();
+    saveGame();
+}
+
+/**
+ * Fire staff member
+ */
+function fireStaff(staffId) {
+    if (gameState.staff.length <= 3) {
+        showNotification('Cannot fire initial staff members!', 'error');
+        return;
+    }
+
+    // Remove staff
+    const staff = gameState.staff.find(s => s.id === staffId);
+    if (!staff) return;
+
+    const role = staff.role;
+    gameState.staff = gameState.staff.filter(s => s.id !== staffId);
+
+    showNotification(`Fired ${role} #${staffId + 1}`, 'info');
+    renderStaffList();
+    updateUI();
+    saveGame();
+}
+
+// ================================
+// COOK AUTOMATION BASED ON DEMAND
+// ================================
+
+/**
+ * Intelligent cook automation - cooks based on customer orders
+ */
+function autoCookBasedOnDemand() {
+    // Get all cook staff
+    const cooks = gameState.staff.filter(s => s.role === 'cook');
+
+    if (cooks.length === 0) return;
+
+    // Calculate food demand based on:
+    // 1. Current customer orders (waiting customers)
+    // 2. Recent order patterns
+    // 3. Storage levels
+
+    const foodDemand = {};
+
+    // Count what customers are currently ordering
+    gameState.customers.forEach(customer => {
+        const order = customer.order;
+        foodDemand[order] = (foodDemand[order] || 0) + 1;
+    });
+
+    // Check storage levels and cook more if low
+    const unlockedRecipes = getUnlockedRecipes();
+    unlockedRecipes.forEach(foodType => {
+        const currentStock = countFoodInStorage(foodType);
+
+        // If stock is low (< 2), increase demand
+        if (currentStock < 2) {
+            foodDemand[foodType] = (foodDemand[foodType] || 0) + 2;
+        }
+    });
+
+    // Assign cooks to stations and start cooking based on demand
+    const availableStations = [1, 2, 3, 4].filter(id => gameState.stations[id].unlocked);
+
+    cooks.forEach((cook, index) => {
+        if (index >= availableStations.length) return; // No more stations
+
+        const stationId = availableStations[index];
+        cook.assignedStation = stationId;
+
+        // Find food with highest demand that isn't already cooking
+        let topFood = null;
+        let topDemand = 0;
+
+        Object.entries(foodDemand).forEach(([food, demand]) => {
+            if (demand > topDemand) {
+                topFood = food;
+                topDemand = demand;
+            }
+        });
+
+        if (topFood && topDemand > 0) {
+            // Start cooking if station has available slots
+            const station = gameState.stations[stationId];
+            const availableSlot = station.cookingSlots.find(slot => !slot.cooking);
+
+            if (availableSlot) {
+                startCooking(topFood, stationId);
+                // Reduce demand after starting to cook
+                foodDemand[topFood]--;
+            }
+        }
+    });
+}
+
+/**
+ * Count how many of a food type are in storage
+ */
+function countFoodInStorage(foodType) {
+    let count = 0;
+    gameState.storageTables.forEach(table => {
+        count += table.foods.filter(f => f === foodType).length;
+    });
+    count += gameState.inventory.filter(f => f === foodType).length;
+    return count;
+}
+
+// Run cook automation every 3 seconds
+setInterval(() => {
+    autoCookBasedOnDemand();
+}, 3000);
+
+// ================================
+// ENHANCED CLEANER - FLOOR CLEANING
+// ================================
+
+/**
+ * Floor dirt tracking
+ */
+if (!gameState.floorDirt) {
+    gameState.floorDirt = [];
+}
+
+/**
+ * Randomly spawn floor dirt
+ */
+function spawnFloorDirt() {
+    if (Math.random() < 0.3) { // 30% chance
+        const dirt = {
+            id: Date.now(),
+            x: Math.random() * 80 + 10, // Random position (10% to 90%)
+            y: Math.random() * 80 + 10
+        };
+        gameState.floorDirt.push(dirt);
+
+        // Don't spawn too much dirt
+        if (gameState.floorDirt.length > 5) {
+            gameState.floorDirt.shift();
+        }
+    }
+}
+
+// Spawn dirt every 20 seconds
+setInterval(spawnFloorDirt, 20000);
+
+/**
+ * Cleaner cleans floor dirt
+ */
+function cleanFloorDirt() {
+    const cleaners = gameState.staff.filter(s => s.role === 'cleaner' && s.status === 'idle');
+
+    if (cleaners.length === 0 || gameState.floorDirt.length === 0) return;
+
+    const cleaner = cleaners[0];
+    const dirt = gameState.floorDirt[0];
+
+    if (!dirt) return;
+
+    cleaner.status = 'cleaning_floor';
+
+    // Move to dirt location
+    moveStaffTo(cleaner, dirt.x, dirt.y, () => {
+        // Clean the dirt
+        gameState.floorDirt = gameState.floorDirt.filter(d => d.id !== dirt.id);
+        showNotification('Floor cleaned! ✨', 'success');
+
+        cleaner.status = 'idle';
+
+        // Continue cleaning or clean tables
+        setTimeout(() => {
+            if (gameState.floorDirt.length > 0) {
+                cleanFloorDirt();
+            } else if (gameState.dirtyTables.length > 0) {
+                cleanNextDirtyTable();
+            }
+        }, 500);
+    });
+}
+
+// Run floor cleaning check every 5 seconds
+setInterval(() => {
+    cleanFloorDirt();
+}, 5000);
 
 // Auto-save every 30 seconds
 setInterval(() => {
