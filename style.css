@@ -189,174 +189,708 @@ body {
     pointer-events: none;
 }
 
-/* Animated Waiter Character */
+/* Animated 3D Waiter Character */
 .waiter {
     position: absolute;
-    width: 60px;
-    height: 80px;
+    width: 80px;
+    height: 120px;
     z-index: 100;
     transition: left 1s ease-in-out, top 1s ease-in-out, transform 0.3s ease;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
 }
 
-.waiter.walking {
-    animation: none;
-}
-
-.waiter.walking .waiter-legs {
-    animation: walking 0.6s infinite;
-}
-
-.waiter-body {
+.waiter-character {
     position: relative;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    transform-style: preserve-3d;
 }
 
+/* Head and Face */
 .waiter-head {
-    font-size: 2.5em;
-    margin-bottom: 5px;
+    position: relative;
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(circle at 30% 30%, #ffdbac 0%, #f4c49c 50%, #d9a066 100%);
+    border-radius: 50%;
+    margin-bottom: 4px;
+    box-shadow:
+        inset -3px -3px 8px rgba(0, 0, 0, 0.2),
+        inset 3px 3px 8px rgba(255, 255, 255, 0.4),
+        0 4px 8px rgba(0, 0, 0, 0.3);
     animation: headBob 0.8s infinite ease-in-out;
-    transform-origin: center bottom;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    z-index: 10;
 }
 
 @keyframes headBob {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-3px) scale(1.05); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
 }
 
-.waiter-legs {
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.eye {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #2c3e50;
+    border-radius: 50%;
+    top: 12px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.left-eye {
+    left: 8px;
+}
+
+.right-eye {
+    right: 8px;
+}
+
+.smile {
+    position: absolute;
+    width: 10px;
+    height: 6px;
+    border: 1px solid #c89060;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Chef Hat */
+.chef-hat {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: -1;
+}
+
+.hat-top {
+    width: 28px;
+    height: 20px;
+    background: radial-gradient(ellipse at 40% 30%, #ffffff 0%, #f5f5f5 50%, #e0e0e0 100%);
+    border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+    box-shadow:
+        inset -2px -2px 5px rgba(0, 0, 0, 0.1),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.8),
+        0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.hat-band {
+    width: 32px;
+    height: 6px;
+    background: linear-gradient(180deg, #ffffff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    margin-top: -2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Torso */
+.waiter-torso {
     position: relative;
-    width: 40px;
+    width: 36px;
+    height: 40px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border-radius: 8px 8px 4px 4px;
+    box-shadow:
+        inset -3px 0 8px rgba(0, 0, 0, 0.2),
+        inset 3px 0 8px rgba(255, 255, 255, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+.shirt {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+    border-radius: 8px 8px 4px 4px;
+}
+
+.apron {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
     height: 30px;
+    background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+    border-radius: 0 0 4px 4px;
+    box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.1),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Arms */
+.arms {
+    position: absolute;
+    top: 36px;
+    width: 100%;
+    height: 50px;
+    z-index: 4;
+}
+
+.arm {
+    position: absolute;
+    transform-origin: top center;
+}
+
+.left-arm {
+    left: -8px;
+}
+
+.right-arm {
+    right: -8px;
+}
+
+.upper-arm {
+    width: 10px;
+    height: 18px;
+    background: linear-gradient(135deg, #3498db 0%, #2574a9 100%);
+    border-radius: 5px 5px 3px 3px;
+    box-shadow:
+        inset -1px 0 3px rgba(0, 0, 0, 0.3),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.lower-arm {
+    width: 8px;
+    height: 16px;
+    background: radial-gradient(circle at 30% 30%, #ffdbac 0%, #f4c49c 50%, #d9a066 100%);
+    border-radius: 4px;
+    margin-top: 2px;
+    margin-left: 1px;
+    box-shadow:
+        inset -1px -1px 3px rgba(0, 0, 0, 0.2),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hand {
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle at 40% 40%, #ffdbac 0%, #e6b88c 100%);
+    border-radius: 50%;
+    margin-top: 2px;
+    box-shadow:
+        inset -1px -1px 3px rgba(0, 0, 0, 0.2),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.left-arm {
+    animation: leftArmSwing 0.8s infinite ease-in-out;
+}
+
+.right-arm {
+    animation: rightArmSwing 0.8s infinite ease-in-out;
+}
+
+@keyframes leftArmSwing {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+@keyframes rightArmSwing {
+    0%, 100% { transform: rotate(5deg); }
+    50% { transform: rotate(-5deg); }
+}
+
+.waiter.walking .left-arm {
+    animation: leftArmWalk 0.6s infinite;
+}
+
+.waiter.walking .right-arm {
+    animation: rightArmWalk 0.6s infinite;
+}
+
+@keyframes leftArmWalk {
+    0%, 100% { transform: rotate(-15deg); }
+    50% { transform: rotate(25deg); }
+}
+
+@keyframes rightArmWalk {
+    0%, 100% { transform: rotate(15deg); }
+    50% { transform: rotate(-25deg); }
+}
+
+/* Legs */
+.waiter-legs {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 45px;
     display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
+    justify-content: center;
+    gap: 4px;
+    z-index: 3;
 }
 
 .leg {
-    width: 8px;
-    height: 20px;
-    background: linear-gradient(180deg, #333 0%, #555 100%);
-    border-radius: 4px;
+    position: relative;
+    width: 14px;
+}
+
+.thigh {
+    width: 12px;
+    height: 18px;
+    background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+    border-radius: 6px 6px 3px 3px;
+    box-shadow:
+        inset -2px 0 4px rgba(0, 0, 0, 0.3),
+        2px 2px 6px rgba(0, 0, 0, 0.4);
     transform-origin: top center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes walking {
-    0% {
-        transform: translateY(0);
-    }
-    25% {
-        transform: translateY(-2px);
-    }
-    50% {
-        transform: translateY(0);
-    }
-    75% {
-        transform: translateY(-2px);
-    }
-    100% {
-        transform: translateY(0);
-    }
+.shin {
+    width: 10px;
+    height: 16px;
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    border-radius: 5px;
+    margin: 2px 0 0 1px;
+    box-shadow:
+        inset -1px -1px 3px rgba(0, 0, 0, 0.3),
+        2px 2px 5px rgba(0, 0, 0, 0.4);
 }
 
-.leg.left {
-    animation: legLeft 0.6s infinite;
+.foot {
+    width: 14px;
+    height: 8px;
+    background: linear-gradient(135deg, #1a252f 0%, #0d1419 100%);
+    border-radius: 3px 3px 0 0;
+    margin-top: 2px;
+    margin-left: -1px;
+    box-shadow:
+        inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+        2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-.leg.right {
-    animation: legRight 0.6s infinite;
+.left-leg .thigh {
+    animation: leftThighIdle 0.8s infinite ease-in-out;
 }
 
-@keyframes legLeft {
+.right-leg .thigh {
+    animation: rightThighIdle 0.8s infinite ease-in-out;
+}
+
+@keyframes leftThighIdle {
     0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(-15deg); }
+    50% { transform: rotate(-3deg); }
 }
 
-@keyframes legRight {
+@keyframes rightThighIdle {
     0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(15deg); }
+    50% { transform: rotate(3deg); }
 }
 
-.waiter.walking .leg.left {
-    animation: legLeftWalk 0.4s infinite;
+.waiter.walking .left-leg .thigh {
+    animation: leftThighWalk 0.6s infinite;
 }
 
-.waiter.walking .leg.right {
-    animation: legRightWalk 0.4s infinite;
+.waiter.walking .right-leg .thigh {
+    animation: rightThighWalk 0.6s infinite;
 }
 
-@keyframes legLeftWalk {
+@keyframes leftThighWalk {
     0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(20deg); }
-    75% { transform: rotate(-20deg); }
+    25% { transform: rotate(30deg); }
+    75% { transform: rotate(-30deg); }
 }
 
-@keyframes legRightWalk {
+@keyframes rightThighWalk {
     0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-20deg); }
-    75% { transform: rotate(20deg); }
+    25% { transform: rotate(-30deg); }
+    75% { transform: rotate(30deg); }
 }
 
+/* Food Tray */
 .food-tray {
     position: absolute;
-    top: 40%;
-    right: -25px;
-    width: 35px;
-    height: 35px;
-    background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(circle at 40% 40%, #ffffff 0%, #e8e8e8 50%, #d0d0d0 100%);
     border-radius: 50%;
-    border: 3px solid #ccc;
+    border: 2px solid #b8b8b8;
     box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.3),
-        inset 0 2px 5px rgba(255, 255, 255, 0.5);
-    display: flex;
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        inset 0 2px 6px rgba(255, 255, 255, 0.6),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+    display: none;
     align-items: center;
     justify-content: center;
-    font-size: 1.5em;
+    font-size: 1.6em;
     animation: trayFloat 1s infinite ease-in-out;
-}
-
-@keyframes trayFloat {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-4px) rotate(-5deg); }
+    z-index: 15;
 }
 
 .food-tray::before {
     content: '';
     position: absolute;
-    bottom: -8px;
+    bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
-    width: 4px;
-    height: 12px;
-    background: linear-gradient(180deg, #888 0%, #555 100%);
+    width: 3px;
+    height: 10px;
+    background: linear-gradient(180deg, #999 0%, #666 100%);
     border-radius: 2px;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+@keyframes trayFloat {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-3px); }
+}
+
+/* Shadow */
 .waiter-shadow {
     position: absolute;
-    bottom: -15px;
+    bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
-    height: 20px;
-    background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+    width: 60px;
+    height: 25px;
+    background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 80%);
     border-radius: 50%;
     animation: shadowPulse 0.8s infinite ease-in-out;
+    z-index: 1;
 }
 
 @keyframes shadowPulse {
-    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.4; }
-    50% { transform: translateX(-50%) scale(1.1); opacity: 0.6; }
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translateX(-50%) scale(1.1);
+        opacity: 0.7;
+    }
+}
+
+/* 3D Food Models */
+.food-3d {
+    position: relative;
+    display: inline-block;
+    transform-style: preserve-3d;
+}
+
+/* 3D Burger */
+.burger-3d {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+.burger-top-bun {
+    width: 40px;
+    height: 18px;
+    background: radial-gradient(circle at 40% 30%, #f4d4a0 0%, #d9a066 50%, #c4895c 100%);
+    border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+    box-shadow:
+        inset -2px -2px 5px rgba(0, 0, 0, 0.2),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.4),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 5;
+    margin-bottom: -3px;
+}
+
+.burger-top-bun::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #c9975f;
+    border-radius: 50%;
+    top: 8px;
+    left: 15px;
+    box-shadow:
+        8px 0 0 #c9975f,
+        4px -2px 0 #c9975f,
+        12px 2px 0 #c9975f;
+}
+
+.burger-lettuce {
+    width: 38px;
+    height: 6px;
+    background: linear-gradient(135deg, #7cb342 0%, #558b2f 100%);
+    border-radius: 3px;
+    box-shadow:
+        inset -1px -1px 3px rgba(0, 0, 0, 0.3),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 4;
+    margin-bottom: -2px;
+}
+
+.burger-cheese {
+    width: 42px;
+    height: 5px;
+    background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%);
+    border-radius: 2px;
+    box-shadow:
+        inset -1px -1px 2px rgba(0, 0, 0, 0.2),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 3;
+    margin-bottom: -2px;
+}
+
+.burger-patty {
+    width: 38px;
+    height: 10px;
+    background: radial-gradient(circle at 40% 40%, #8d6e63 0%, #5d4037 50%, #3e2723 100%);
+    border-radius: 4px;
+    box-shadow:
+        inset -2px -2px 4px rgba(0, 0, 0, 0.4),
+        inset 2px 2px 4px rgba(139, 110, 99, 0.3),
+        2px 3px 6px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 2;
+    margin-bottom: -2px;
+}
+
+.burger-bottom-bun {
+    width: 40px;
+    height: 12px;
+    background: linear-gradient(180deg, #e6b87a 0%, #c4895c 100%);
+    border-radius: 0 0 50% 50% / 0 0 40% 40%;
+    box-shadow:
+        inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+/* 3D Pizza Slice */
+.pizza-3d {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+.pizza-slice {
+    width: 0;
+    height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 38px solid #f4a460;
+    position: relative;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.pizza-slice::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 35px solid #e6904f;
+    left: -20px;
+    top: 2px;
+    z-index: -1;
+}
+
+.pizza-cheese {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-bottom: 32px solid #fff9c4;
+    left: -18px;
+    top: 3px;
+    opacity: 0.9;
+}
+
+.pizza-pepperoni {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle at 30% 30%, #e53935 0%, #b71c1c 100%);
+    border-radius: 50%;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        inset -1px -1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.pepperoni-1 {
+    left: 50%;
+    top: 10px;
+    transform: translateX(-50%);
+}
+
+.pepperoni-2 {
+    left: 30%;
+    top: 20px;
+}
+
+.pepperoni-3 {
+    right: 30%;
+    top: 20px;
+}
+
+/* 3D Coffee Cup */
+.coffee-3d {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+.coffee-cup {
+    width: 32px;
+    height: 35px;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 50%, #e0e0e0 100%);
+    border-radius: 0 0 8px 8px;
+    position: relative;
+    box-shadow:
+        inset -3px 0 6px rgba(0, 0, 0, 0.15),
+        inset 3px 0 6px rgba(255, 255, 255, 0.5),
+        0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid #d0d0d0;
+    border-top: none;
+}
+
+.coffee-cup::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -2px;
+    right: -2px;
+    height: 6px;
+    background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-radius: 3px 3px 0 0;
+    border: 2px solid #d0d0d0;
+    border-bottom: none;
+}
+
+.coffee-liquid {
+    position: absolute;
+    top: 8px;
+    left: 2px;
+    right: 2px;
+    height: 20px;
+    background: radial-gradient(circle at 40% 30%, #6d4c41 0%, #4e342e 50%, #3e2723 100%);
+    border-radius: 0 0 6px 6px;
+    box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 -2px 4px rgba(109, 76, 65, 0.3);
+}
+
+.coffee-handle {
+    position: absolute;
+    right: -12px;
+    top: 8px;
+    width: 14px;
+    height: 18px;
+    border: 3px solid #e0e0e0;
+    border-left: none;
+    border-radius: 0 50% 50% 0;
+    box-shadow:
+        2px 2px 4px rgba(0, 0, 0, 0.2),
+        inset -1px 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.coffee-steam {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 12px;
+}
+
+.steam-line {
+    position: absolute;
+    width: 2px;
+    height: 8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, transparent 100%);
+    border-radius: 2px;
+    animation: steam 2s infinite ease-in-out;
+}
+
+.steam-1 {
+    left: 5px;
+    animation-delay: 0s;
+}
+
+.steam-2 {
+    left: 9px;
+    animation-delay: 0.3s;
+}
+
+.steam-3 {
+    left: 13px;
+    animation-delay: 0.6s;
+}
+
+@keyframes steam {
+    0% {
+        opacity: 0;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Food models in different contexts */
+.food-tray .food-3d {
+    transform: scale(0.6);
+}
+
+.customer-order .food-3d {
+    transform: scale(1);
+}
+
+.inventory-item .food-3d {
+    transform: scale(0.7);
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.food-count {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--dark);
+    margin-left: 8px;
+    vertical-align: middle;
 }
 
 .tables-container {
@@ -429,23 +963,112 @@ body {
     border: 2px solid var(--accent-color);
 }
 
+/* 3D Customer Figure */
 .customer {
-    font-size: 3em;
-    margin: 10px 0;
+    position: relative;
+    width: 50px;
+    height: 70px;
+    margin: 10px auto;
     animation: customerBounce 1s infinite ease-in-out;
-    filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
 }
 
 @keyframes customerBounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-10px) scale(1.1); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.customer-figure {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.customer-head {
+    width: 22px;
+    height: 22px;
+    background: radial-gradient(circle at 35% 35%, #ffd4a3 0%, #f0b47d 50%, #d4956e 100%);
+    border-radius: 50%;
+    margin-bottom: 3px;
+    box-shadow:
+        inset -2px -2px 5px rgba(0, 0, 0, 0.15),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.3),
+        0 3px 6px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 5;
+}
+
+.customer-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.customer-eye {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    top: 8px;
+}
+
+.customer-eye.left {
+    left: 6px;
+}
+
+.customer-eye.right {
+    right: 6px;
+}
+
+.customer-smile {
+    position: absolute;
+    width: 8px;
+    height: 4px;
+    border: 1px solid #b8845d;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.customer-body {
+    width: 26px;
+    height: 28px;
+    /* Background set via inline style for variety */
+    border-radius: 6px 6px 3px 3px;
+    box-shadow:
+        inset -2px 0 5px rgba(0, 0, 0, 0.2),
+        inset 2px 0 5px rgba(255, 255, 255, 0.15),
+        0 3px 6px rgba(0, 0, 0, 0.3);
+    margin-bottom: 2px;
+    z-index: 4;
+}
+
+.customer-legs-wrapper {
+    display: flex;
+    gap: 3px;
+    z-index: 3;
+}
+
+.customer-leg {
+    width: 8px;
+    height: 14px;
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    border-radius: 4px 4px 2px 2px;
+    box-shadow:
+        inset -1px 0 2px rgba(0, 0, 0, 0.3),
+        2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .customer-order {
-    font-size: 2.5em;
     background: white;
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1054,7 +1677,23 @@ body {
     }
 
     .customer {
-        font-size: 2.2em;
+        width: 40px;
+        height: 56px;
+    }
+
+    .customer-head {
+        width: 18px;
+        height: 18px;
+    }
+
+    .customer-body {
+        width: 22px;
+        height: 24px;
+    }
+
+    .customer-leg {
+        width: 7px;
+        height: 12px;
     }
 
     .customer-order {
@@ -1069,18 +1708,47 @@ body {
 
     /* Waiter responsive adjustments */
     .waiter {
-        width: 50px;
-        height: 65px;
+        width: 60px;
+        height: 95px;
     }
 
     .waiter-head {
-        font-size: 2em;
+        width: 24px;
+        height: 24px;
+    }
+
+    .hat-top {
+        width: 22px;
+        height: 16px;
+    }
+
+    .hat-band {
+        width: 24px;
+        height: 5px;
+    }
+
+    .waiter-torso {
+        width: 28px;
+        height: 32px;
     }
 
     .food-tray {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
         font-size: 1.2em;
-        right: -20px;
+    }
+
+    .leg {
+        width: 10px;
+    }
+
+    .thigh {
+        width: 9px;
+        height: 14px;
+    }
+
+    .shin {
+        width: 7px;
+        height: 12px;
     }
 }

@@ -32,8 +32,60 @@ const foodData = {
     coffee: { name: 'Coffee', icon: '☕', cookTime: 3000, price: 10 }
 };
 
-// Customer Icons
-const customerIcons = ['👨', '👩', '👦', '👧', '🧑', '👴', '👵', '🧔'];
+// Customer shirt colors for variety
+const customerShirtColors = [
+    'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)', // Red
+    'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', // Blue
+    'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)', // Green
+    'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)', // Orange
+    'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)', // Purple
+    'linear-gradient(135deg, #1abc9c 0%, #16a085 100%)', // Teal
+    'linear-gradient(135deg, #e91e63 0%, #c2185b 100%)', // Pink
+    'linear-gradient(135deg, #34495e 0%, #2c3e50 100%)'  // Gray
+];
+
+// Generate 3D Food Models
+function get3DFoodHTML(foodType) {
+    switch(foodType) {
+        case 'burger':
+            return `
+                <div class="food-3d burger-3d">
+                    <div class="burger-top-bun"></div>
+                    <div class="burger-lettuce"></div>
+                    <div class="burger-cheese"></div>
+                    <div class="burger-patty"></div>
+                    <div class="burger-bottom-bun"></div>
+                </div>
+            `;
+        case 'pizza':
+            return `
+                <div class="food-3d pizza-3d">
+                    <div class="pizza-slice">
+                        <div class="pizza-cheese"></div>
+                        <div class="pizza-pepperoni pepperoni-1"></div>
+                        <div class="pizza-pepperoni pepperoni-2"></div>
+                        <div class="pizza-pepperoni pepperoni-3"></div>
+                    </div>
+                </div>
+            `;
+        case 'coffee':
+            return `
+                <div class="food-3d coffee-3d">
+                    <div class="coffee-cup">
+                        <div class="coffee-liquid"></div>
+                        <div class="coffee-handle"></div>
+                    </div>
+                    <div class="coffee-steam">
+                        <div class="steam-line steam-1"></div>
+                        <div class="steam-line steam-2"></div>
+                        <div class="steam-line steam-3"></div>
+                    </div>
+                </div>
+            `;
+        default:
+            return foodData[foodType]?.icon || '';
+    }
+}
 
 // Initialize Game
 function initGame() {
@@ -144,7 +196,7 @@ function startCooking(foodType, stationId) {
     const cookButtons = stationElement.querySelectorAll('.cook-btn');
 
     cookButtons.forEach(btn => btn.disabled = true);
-    cookingItem.textContent = `Cooking ${food.icon}`;
+    cookingItem.innerHTML = `Cooking <div style="transform: scale(0.6); display: inline-block; vertical-align: middle;">${get3DFoodHTML(foodType)}</div>`;
 
     // Animate progress
     const startTime = Date.now();
@@ -170,7 +222,7 @@ function finishCooking(stationId) {
     const cookButtons = stationElement.querySelectorAll('.cook-btn');
 
     const food = foodData[station.currentFood];
-    cookingItem.textContent = `${food.icon} Ready!`;
+    cookingItem.innerHTML = `<div style="transform: scale(0.8); display: inline-block;">${get3DFoodHTML(station.currentFood)}</div> Ready!`;
     serveBtnElement.style.display = 'block';
 
     // Add to inventory button
@@ -230,7 +282,7 @@ function updateInventoryUI() {
         const food = foodData[foodType];
         const div = document.createElement('div');
         div.className = 'inventory-item';
-        div.textContent = `${food.icon} x${foodCount[foodType]}`;
+        div.innerHTML = `${get3DFoodHTML(foodType)} <span class="food-count">x${foodCount[foodType]}</span>`;
         div.title = `Click to serve ${food.name}`;
         inventoryElement.appendChild(div);
     });
@@ -276,11 +328,10 @@ function updateWaiterTray() {
     if (!waiterTray) return;
 
     if (gameState.waiter.currentFood) {
-        const food = foodData[gameState.waiter.currentFood];
-        waiterTray.textContent = food.icon;
+        waiterTray.innerHTML = get3DFoodHTML(gameState.waiter.currentFood);
         waiterTray.style.display = 'flex';
     } else {
-        waiterTray.textContent = '';
+        waiterTray.innerHTML = '';
         waiterTray.style.display = 'none';
     }
 }
@@ -415,11 +466,11 @@ function spawnCustomer() {
 
     const foodTypes = Object.keys(foodData);
     const randomFood = foodTypes[Math.floor(Math.random() * foodTypes.length)];
-    const customerIcon = customerIcons[Math.floor(Math.random() * customerIcons.length)];
+    const randomShirtColor = customerShirtColors[Math.floor(Math.random() * customerShirtColors.length)];
 
     const customer = {
         id: gameState.nextCustomerId++,
-        icon: customerIcon,
+        shirtColor: randomShirtColor,
         order: randomFood,
         patience: 100,
         tableId: emptyTable.id,
@@ -480,9 +531,24 @@ function updateTableUI(table) {
             </div>
             <div class="table-content">
                 <div class="table-number">Table ${table.id + 1}</div>
-                <div class="customer">${customer.icon}</div>
+                <div class="customer">
+                    <div class="customer-figure">
+                        <div class="customer-head">
+                            <div class="customer-face">
+                                <div class="customer-eye left"></div>
+                                <div class="customer-eye right"></div>
+                                <div class="customer-smile"></div>
+                            </div>
+                        </div>
+                        <div class="customer-body" style="background: ${customer.shirtColor}"></div>
+                        <div class="customer-legs-wrapper">
+                            <div class="customer-leg"></div>
+                            <div class="customer-leg"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="order-label">Wants</div>
-                <div class="customer-order">${food.icon}</div>
+                <div class="customer-order">${get3DFoodHTML(customer.order)}</div>
                 <div class="patience-bar">
                     <div class="patience-fill"></div>
                 </div>
