@@ -115,6 +115,18 @@
                                         <span>Station 1</span>
                                     </div>
                                     <div class="station-content">
+                                        <div class="auto-cook-controls">
+                                            <label class="auto-cook-label">
+                                                <input type="checkbox" class="auto-cook-toggle" data-station="1">
+                                                <span>Auto-Cook:</span>
+                                            </label>
+                                            <select class="auto-cook-select" data-station="1">
+                                                <option value="">Select Food</option>
+                                                <option value="coffee">☕ Coffee</option>
+                                                <option value="burger">🍔 Burger</option>
+                                                <option value="pizza">🍕 Pizza</option>
+                                            </select>
+                                        </div>
                                         <div class="food-buttons">
                                             <button class="cook-btn" data-food="burger" data-station="1">
                                                 <span class="food-icon">🍔</span>
@@ -161,6 +173,18 @@
                                             <button class="unlock-btn" data-station="2">
                                                 <span>🔓 Unlock</span>
                                             </button>
+                                        </div>
+                                        <div class="auto-cook-controls" style="display: none;">
+                                            <label class="auto-cook-label">
+                                                <input type="checkbox" class="auto-cook-toggle" data-station="2">
+                                                <span>Auto-Cook:</span>
+                                            </label>
+                                            <select class="auto-cook-select" data-station="2">
+                                                <option value="">Select Food</option>
+                                                <option value="coffee">☕ Coffee</option>
+                                                <option value="burger">🍔 Burger</option>
+                                                <option value="pizza">🍕 Pizza</option>
+                                            </select>
                                         </div>
                                         <div class="food-buttons" style="display: none;">
                                             <button class="cook-btn" data-food="burger" data-station="2">
