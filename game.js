@@ -60,16 +60,68 @@ const gameState = {
     },
     customers: [],
     nextCustomerId: 1,
-    waiter: {
-        position: { x: 50, y: 50 },
-        currentFood: null,
-        status: 'idle', // idle, moving_to_table, serving, moving_to_kitchen, moving_to_storage
-        targetTable: null,
-        targetStorage: null,
-        servingQueue: []
-    },
+    // Multiple staff members - Restaurant City style!
+    staff: [
+        {
+            id: 0,
+            role: 'server', // Serves food to customers
+            position: { x: 100, y: 100 },
+            currentFood: null,
+            status: 'idle',
+            targetTable: null,
+            targetStorage: null,
+            servingQueue: [],
+            color: '#3498db' // Blue uniform
+        },
+        {
+            id: 1,
+            role: 'cleaner', // Cleans dirty tables
+            position: { x: 150, y: 100 },
+            status: 'idle',
+            targetTable: null,
+            cleaningQueue: [],
+            color: '#2ecc71' // Green uniform
+        },
+        {
+            id: 2,
+            role: 'cook', // Manages cooking stations
+            position: { x: 200, y: 100 },
+            status: 'idle',
+            assignedStation: 1,
+            cookingQueue: [],
+            color: '#e74c3c' // Red/chef uniform
+        }
+    ],
     autoServe: false
 };
+
+// Helper functions for staff management
+function getStaffByRole(role) {
+    return gameState.staff.find(s => s.role === role);
+}
+
+function getServerStaff() {
+    return getStaffByRole('server');
+}
+
+function getCleanerStaff() {
+    return getStaffByRole('cleaner');
+}
+
+function getCookStaff() {
+    return getStaffByRole('cook');
+}
+
+// Backward compatibility: Map old waiter API to new staff system
+Object.defineProperty(gameState, 'waiter', {
+    get() {
+        return getServerStaff(); // Default to server for backward compatibility
+    },
+    set(value) {
+        const server = getServerStaff();
+        Object.assign(server, value);
+    }
+});
 
 // Food Data
 const foodData = {
@@ -372,9 +424,9 @@ function finishCooking(stationId, slotIndex) {
 
 // Find storage table for specific food type (only one food type per table)
 function findAvailableStorageTable(foodType) {
-    // First, look for a table that already has this food type
+    // First, look for a table that already has this food type (unlimited capacity)
     let existingTable = gameState.storageTables.find(table =>
-        table.foodType === foodType && table.foods.length < 10
+        table.foodType === foodType
     );
 
     if (existingTable) {
@@ -630,6 +682,48 @@ function moveWaiterTo(x, y, callback) {
     // Remove walking class after movement completes
     setTimeout(() => {
         waiter.classList.remove('walking');
+        if (callback) callback();
+    }, 1000);
+}
+
+// Generic staff movement function
+function moveStaffTo(staff, x, y, callback) {
+    const staffElement = document.getElementById(`staff-${staff.id}`);
+
+    if (!staffElement) {
+        // Fallback to waiter element for backward compatibility
+        if (staff.role === 'server') {
+            return moveWaiterTo(x, y, callback);
+        }
+        console.warn(`Staff element not found for staff ${staff.id}`);
+        if (callback) callback();
+        return;
+    }
+
+    // Add walking class for animation
+    staffElement.classList.add('walking');
+
+    // Calculate direction for facing
+    const currentX = parseFloat(staffElement.style.left) || staff.position.x;
+    const deltaX = x - currentX;
+
+    // Flip staff based on direction
+    if (deltaX < 0) {
+        staffElement.style.transform = 'translate(-50%, -50%) scaleX(-1)';
+    } else {
+        staffElement.style.transform = 'translate(-50%, -50%) scaleX(1)';
+    }
+
+    // Move staff
+    staffElement.style.left = x + '%';
+    staffElement.style.top = y + '%';
+
+    // Update staff state
+    staff.position = { x, y };
+
+    // Remove walking class after movement completes
+    setTimeout(() => {
+        staffElement.classList.remove('walking');
         if (callback) callback();
     }, 1000);
 }
@@ -900,6 +994,24 @@ function updateTableUI(table) {
         tableElement.innerHTML = `
             <div class="table-base">
                 <div class="table-top"></div>
+                <div class="table-chairs">
+                    <div class="chair top">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair bottom">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair left">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair right">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                </div>
             </div>
             <div class="table-content">
                 <div class="table-number">Table ${table.id + 1}</div>
@@ -935,6 +1047,24 @@ function updateTableUI(table) {
         tableElement.innerHTML = `
             <div class="table-base">
                 <div class="table-top"></div>
+                <div class="table-chairs">
+                    <div class="chair top">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair bottom">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair left">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair right">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                </div>
             </div>
             <div class="table-content">
                 <div class="table-number">Table ${table.id + 1}</div>
@@ -950,6 +1080,24 @@ function updateTableUI(table) {
         tableElement.innerHTML = `
             <div class="table-base">
                 <div class="table-top"></div>
+                <div class="table-chairs">
+                    <div class="chair top">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair bottom">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair left">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                    <div class="chair right">
+                        <div class="chair-back"></div>
+                        <div class="chair-seat"></div>
+                    </div>
+                </div>
             </div>
             <div class="table-content">
                 <div class="table-number">Table ${table.id + 1}</div>
@@ -1016,7 +1164,8 @@ function customerLeaves(customer, served) {
 
 // Clean dirty tables
 function cleanNextDirtyTable() {
-    if (gameState.waiter.status !== 'idle') return;
+    const cleaner = getCleanerStaff();
+    if (cleaner.status !== 'idle') return;
     if (gameState.dirtyTables.length === 0) return;
 
     const tableId = gameState.dirtyTables.shift();
@@ -1030,12 +1179,12 @@ function cleanNextDirtyTable() {
         return;
     }
 
-    gameState.waiter.status = 'cleaning';
+    cleaner.status = 'cleaning';
     const tablePos = getTablePosition(tableId);
 
-    showNotification('Waiter cleaning table...', 'info');
+    showNotification('Cleaner cleaning table...', 'info');
 
-    moveWaiterTo(tablePos.x, tablePos.y, () => {
+    moveStaffTo(cleaner, tablePos.x, tablePos.y, () => {
         // Clean the table
         table.dirtyPlate = false;
         table.plateFood = null;
@@ -1043,15 +1192,13 @@ function cleanNextDirtyTable() {
 
         showNotification('Table cleaned! ✨', 'success');
 
-        // Reset waiter
-        gameState.waiter.status = 'idle';
+        // Reset cleaner
+        cleaner.status = 'idle';
 
-        // Clean next table or process serving queue
+        // Clean next table
         setTimeout(() => {
             if (gameState.dirtyTables.length > 0) {
                 cleanNextDirtyTable();
-            } else if (gameState.waiter.servingQueue.length > 0) {
-                processServingQueue();
             }
         }, 500);
     });
@@ -1176,6 +1323,8 @@ function saveGame() {
         money: gameState.money,
         level: gameState.level,
         customersServed: gameState.customersServed,
+        inventory: gameState.inventory,
+        storageTables: gameState.storageTables,
         upgrades: gameState.upgrades,
         stations: gameState.stations,
         autoServe: gameState.autoServe
@@ -1190,6 +1339,17 @@ function loadGame() {
         gameState.money = data.money || 100;
         gameState.level = data.level || 1;
         gameState.customersServed = data.customersServed || 0;
+
+        // Restore inventory
+        if (data.inventory) {
+            gameState.inventory = data.inventory;
+        }
+
+        // Restore storage tables with their food
+        if (data.storageTables) {
+            gameState.storageTables = data.storageTables;
+            updateStorageTablesUI();
+        }
 
         if (data.upgrades) {
             gameState.upgrades = data.upgrades;

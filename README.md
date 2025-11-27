@@ -4,15 +4,25 @@ A fun and engaging browser-based restaurant management game inspired by "Nhà H�
 
 ## 🎮 Play the Game
 
-**[Play Now on GitHub Pages](#)** *(Link will be available after deployment)*
+**[🎮 Play Now on GitHub Pages!](https://sampi314.github.io/Java-Game-Development/)**
+
+Click the link above to start playing the game directly in your browser!
 
 ## 📖 Game Features
 
+### 🎯 Restaurant City Inspired!
+This game is inspired by the classic Facebook game **Restaurant City**! Featuring:
+- **Multiple Staff System**: Dedicated server, cleaner, and cook staff
+- **Realistic 2.5D Graphics**: Isometric view with depth and shadows
+- **Table Decorations**: Beautiful chairs around each dining table
+- **Food Storage System**: Dedicated storage tables for each food type (unlimited capacity)
+- **Dirty Plate Cleaning**: Tables must be cleaned after customers finish eating
+
 ### 🍳 Cooking System
 - **Multiple Food Items**: Cook burgers, pizza, and coffee
-- **Two Cooking Stations**: Start with one, unlock the second for $200
+- **Multiple Cooking Stations**: Start with one, unlock more as you grow
 - **Real-time Cooking**: Watch your food cook with animated progress bars
-- **Inventory Management**: Store prepared food and serve when needed
+- **Food Storage Tables**: Store unlimited prepared food on dedicated storage tables
 
 ### 👥 Customer Service
 - **Dynamic Customers**: Customers arrive randomly and occupy tables
