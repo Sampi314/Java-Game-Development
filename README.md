@@ -18,11 +18,21 @@ This game is inspired by the classic Facebook game **Restaurant City**! Featurin
 - **Food Storage System**: Dedicated storage tables for each food type (unlimited capacity)
 - **Dirty Plate Cleaning**: Tables must be cleaned after customers finish eating
 
-### 🍳 Cooking System
-- **Multiple Food Items**: Cook burgers, pizza, and coffee
+### 🍳 Cooking System & Recipe Progression
+- **16 Different Recipes**: From coffee to curry, unlock new dishes as you level up!
+- **Level-Based Unlocks**: New recipes unlock every level (Levels 1-8)
+  - **Level 1**: Coffee, Burger, Pizza (starter recipes)
+  - **Level 2**: Soda, Hot Dog
+  - **Level 3**: Taco, Fries
+  - **Level 4**: Sushi, Ice Cream
+  - **Level 5**: Pasta, Steak
+  - **Level 6**: Salad, Ramen
+  - **Level 7**: Cake
+  - **Level 8**: Curry
 - **Multiple Cooking Stations**: Start with one, unlock more as you grow
 - **Real-time Cooking**: Watch your food cook with animated progress bars
 - **Food Storage Tables**: Store unlimited prepared food on dedicated storage tables
+- **Dynamic Menu**: Food buttons update automatically as you unlock new recipes
 
 ### 👥 Customer Service
 - **Dynamic Customers**: Customers arrive randomly and occupy tables
