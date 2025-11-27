@@ -10,6 +10,7 @@ const gameState = {
         { id: 1, foods: [], foodType: null },
         { id: 2, foods: [], foodType: null }
     ],
+    dirtyTables: [], // Tables that need cleaning
     stations: {
         1: {
             unlocked: true,
@@ -163,7 +164,9 @@ function createTables() {
         const table = {
             id: i,
             occupied: false,
-            customer: null
+            customer: null,
+            dirtyPlate: false,
+            plateFood: null // What food was served (for visual)
         };
         gameState.tables.push(table);
 
@@ -790,8 +793,14 @@ function serveCustomerByWaiter(tableId) {
     updateUI();
     saveGame();
 
-    // Process next item in queue
-    setTimeout(() => processServingQueue(), 500);
+    // Process next item in queue or clean dirty tables
+    setTimeout(() => {
+        if (gameState.waiter.servingQueue.length > 0) {
+            processServingQueue();
+        } else if (gameState.dirtyTables.length > 0) {
+            cleanNextDirtyTable();
+        }
+    }, 500);
 }
 
 // Customer System
@@ -804,10 +813,10 @@ function startCustomerSpawning() {
 }
 
 function spawnCustomer() {
-    const emptyTable = gameState.tables.find(t => !t.occupied);
+    const emptyTable = gameState.tables.find(t => !t.occupied && !t.dirtyPlate);
 
     if (!emptyTable) {
-        return; // No empty tables
+        return; // No empty tables (all occupied or dirty)
     }
 
     // Get available food types from storage tables
@@ -920,6 +929,22 @@ function updateTableUI(table) {
                 }>Serve</button>
             </div>
         `;
+    } else if (table.dirtyPlate) {
+        // Table has dirty plate - needs cleaning
+        tableElement.className = 'table dirty';
+        tableElement.innerHTML = `
+            <div class="table-base">
+                <div class="table-top"></div>
+            </div>
+            <div class="table-content">
+                <div class="table-number">Table ${table.id + 1}</div>
+                <div class="dirty-plate-label">Needs Cleaning</div>
+                <div class="dirty-plate">
+                    ${get3DFoodHTML(table.plateFood)}
+                    <div class="plate-icon">🍽️</div>
+                </div>
+            </div>
+        `;
     } else {
         tableElement.className = 'table empty';
         tableElement.innerHTML = `
@@ -971,9 +996,65 @@ function customerLeaves(customer, served) {
 
     if (!served) {
         showNotification('Customer left unhappy! 😢', 'error');
+    } else {
+        // Leave a dirty plate that needs cleaning
+        table.dirtyPlate = true;
+        table.plateFood = customer.order;
+        // Add to dirty tables queue for waiter to clean
+        if (!gameState.dirtyTables.includes(table.id)) {
+            gameState.dirtyTables.push(table.id);
+        }
     }
 
     updateTableUI(table);
+
+    // Trigger waiter to clean if idle
+    if (gameState.waiter.status === 'idle' && gameState.dirtyTables.length > 0) {
+        cleanNextDirtyTable();
+    }
+}
+
+// Clean dirty tables
+function cleanNextDirtyTable() {
+    if (gameState.waiter.status !== 'idle') return;
+    if (gameState.dirtyTables.length === 0) return;
+
+    const tableId = gameState.dirtyTables.shift();
+    const table = gameState.tables[tableId];
+
+    if (!table || !table.dirtyPlate) {
+        // Table already clean, check next
+        if (gameState.dirtyTables.length > 0) {
+            cleanNextDirtyTable();
+        }
+        return;
+    }
+
+    gameState.waiter.status = 'cleaning';
+    const tablePos = getTablePosition(tableId);
+
+    showNotification('Waiter cleaning table...', 'info');
+
+    moveWaiterTo(tablePos.x, tablePos.y, () => {
+        // Clean the table
+        table.dirtyPlate = false;
+        table.plateFood = null;
+        updateTableUI(table);
+
+        showNotification('Table cleaned! ✨', 'success');
+
+        // Reset waiter
+        gameState.waiter.status = 'idle';
+
+        // Clean next table or process serving queue
+        setTimeout(() => {
+            if (gameState.dirtyTables.length > 0) {
+                cleanNextDirtyTable();
+            } else if (gameState.waiter.servingQueue.length > 0) {
+                processServingQueue();
+            }
+        }, 500);
+    });
 }
 
 // Expose serveCustomer to global scope
