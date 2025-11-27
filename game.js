@@ -797,10 +797,10 @@ function serveCustomerByWaiter(tableId) {
 // Customer System
 function startCustomerSpawning() {
     setInterval(() => {
-        if (Math.random() < 0.3) { // 30% chance every interval
+        if (Math.random() < 0.7) { // 70% chance every interval - busier restaurant!
             spawnCustomer();
         }
-    }, 5000);
+    }, 3000); // Check every 3 seconds instead of 5
 }
 
 function spawnCustomer() {
