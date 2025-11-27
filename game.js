@@ -125,12 +125,102 @@ Object.defineProperty(gameState, 'waiter', {
     }
 });
 
-// Food Data
+// Food Data - Restaurant City Style Menu
 const foodData = {
-    burger: { name: 'Burger', icon: '🍔', cookTime: 5000, price: 15 },
-    pizza: { name: 'Pizza', icon: '🍕', cookTime: 8000, price: 25 },
-    coffee: { name: 'Coffee', icon: '☕', cookTime: 3000, price: 10 }
+    // Starting recipes (Level 1)
+    coffee: { name: 'Coffee', icon: '☕', cookTime: 3000, price: 10, unlockLevel: 1 },
+    burger: { name: 'Burger', icon: '🍔', cookTime: 5000, price: 15, unlockLevel: 1 },
+    pizza: { name: 'Pizza', icon: '🍕', cookTime: 8000, price: 25, unlockLevel: 1 },
+
+    // Level 2 recipes
+    soda: { name: 'Soda', icon: '🥤', cookTime: 2000, price: 8, unlockLevel: 2 },
+    hotdog: { name: 'Hot Dog', icon: '🌭', cookTime: 4000, price: 12, unlockLevel: 2 },
+
+    // Level 3 recipes
+    taco: { name: 'Taco', icon: '🌮', cookTime: 6000, price: 18, unlockLevel: 3 },
+    fries: { name: 'Fries', icon: '🍟', cookTime: 4500, price: 10, unlockLevel: 3 },
+
+    // Level 4 recipes
+    sushi: { name: 'Sushi', icon: '🍣', cookTime: 7000, price: 28, unlockLevel: 4 },
+    icecream: { name: 'Ice Cream', icon: '🍦', cookTime: 3500, price: 14, unlockLevel: 4 },
+
+    // Level 5 recipes
+    pasta: { name: 'Pasta', icon: '🍝', cookTime: 9000, price: 30, unlockLevel: 5 },
+    steak: { name: 'Steak', icon: '🥩', cookTime: 10000, price: 35, unlockLevel: 5 },
+
+    // Level 6 recipes
+    salad: { name: 'Salad', icon: '🥗', cookTime: 5000, price: 16, unlockLevel: 6 },
+    ramen: { name: 'Ramen', icon: '🍜', cookTime: 8500, price: 26, unlockLevel: 6 },
+
+    // Level 7+ recipes
+    cake: { name: 'Cake', icon: '🍰', cookTime: 7500, price: 22, unlockLevel: 7 },
+    curry: { name: 'Curry', icon: '🍛', cookTime: 9500, price: 32, unlockLevel: 8 }
 };
+
+// Get unlocked recipes based on current level
+function getUnlockedRecipes() {
+    return Object.keys(foodData).filter(key => foodData[key].unlockLevel <= gameState.level);
+}
+
+// Get newly unlocked recipes at current level
+function getNewlyUnlockedRecipes() {
+    return Object.keys(foodData).filter(key => foodData[key].unlockLevel === gameState.level);
+}
+
+// Update food buttons for all stations based on unlocked recipes
+function updateFoodButtons() {
+    const unlockedRecipes = getUnlockedRecipes();
+
+    [1, 2, 3, 4].forEach(stationId => {
+        const station = gameState.stations[stationId];
+        if (!station || !station.unlocked) return;
+
+        const stationElement = document.getElementById(`station${stationId}`);
+        if (!stationElement) return;
+
+        const foodButtonsContainer = stationElement.querySelector('.food-buttons');
+        const autoCookSelect = stationElement.querySelector('.auto-cook-select');
+
+        if (foodButtonsContainer) {
+            foodButtonsContainer.innerHTML = '';
+            unlockedRecipes.forEach(foodKey => {
+                const food = foodData[foodKey];
+                const button = document.createElement('button');
+                button.className = 'cook-btn';
+                button.setAttribute('data-food', foodKey);
+                button.setAttribute('data-station', stationId);
+                button.onclick = () => startCooking(foodKey, stationId);
+                button.innerHTML = `
+                    <span class="food-icon">${food.icon}</span>
+                    <span class="food-name">${food.name}</span>
+                    <span class="food-info">${food.cookTime / 1000}s • $${food.price}</span>
+                `;
+                foodButtonsContainer.appendChild(button);
+            });
+        }
+
+        if (autoCookSelect) {
+            autoCookSelect.innerHTML = '<option value="">Select Food</option>';
+            unlockedRecipes.forEach(foodKey => {
+                const food = foodData[foodKey];
+                const option = document.createElement('option');
+                option.value = foodKey;
+                option.textContent = `${food.icon} ${food.name}`;
+                autoCookSelect.appendChild(option);
+            });
+        }
+    });
+}
+
+// Show recipe unlock notification
+function showRecipeUnlockNotification() {
+    const newRecipes = getNewlyUnlockedRecipes();
+    if (newRecipes.length > 0) {
+        const recipeNames = newRecipes.map(key => foodData[key].icon + ' ' + foodData[key].name).join(', ');
+        showNotification(`🎉 New Recipe${newRecipes.length > 1 ? 's' : ''} Unlocked: ${recipeNames}!`, 'success');
+        updateFoodButtons();
+    }
+}
 
 // Customer shirt colors for variety
 const customerShirtColors = [
@@ -197,6 +287,9 @@ function initGame() {
 
     // Load saved game if exists
     loadGame();
+
+    // Initialize food buttons with unlocked recipes
+    updateFoodButtons();
 }
 
 // Initialize Waiter
@@ -875,6 +968,8 @@ function serveCustomerByWaiter(tableId) {
     if (gameState.customersServed % 10 === 0) {
         gameState.level++;
         showNotification(`🎉 Level Up! Now level ${gameState.level}!`, 'success');
+        // Check for newly unlocked recipes
+        setTimeout(() => showRecipeUnlockNotification(), 1000);
     }
 
     // Clear patience interval
@@ -931,15 +1026,20 @@ function spawnCustomer() {
     gameState.inventory.forEach(food => availableFoods.add(food));
 
     // Convert to array
-    const availableFoodTypes = Array.from(availableFoods);
+    let possibleOrders = Array.from(availableFoods);
 
-    // Don't spawn customer if no food is available
-    if (availableFoodTypes.length === 0) {
-        return;
+    // Restaurant City style: If no food available, customer can still order from unlocked recipes
+    // This encourages players to cook more variety
+    if (possibleOrders.length === 0) {
+        possibleOrders = getUnlockedRecipes();
     }
 
-    // Pick random food from available foods
-    const randomFood = availableFoodTypes[Math.floor(Math.random() * availableFoodTypes.length)];
+    if (possibleOrders.length === 0) {
+        return; // No unlocked recipes yet
+    }
+
+    // Pick random food from possible orders
+    const randomFood = possibleOrders[Math.floor(Math.random() * possibleOrders.length)];
     const randomShirtColor = customerShirtColors[Math.floor(Math.random() * customerShirtColors.length)];
 
     const customer = {
