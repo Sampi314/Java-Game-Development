@@ -191,10 +191,8 @@ function setupEventListeners() {
                 const select = document.querySelector(`.auto-cook-select[data-station="${stationId}"]`);
                 if (select.value) {
                     station.autoCookFood = select.value;
-                    // Start cooking if station is idle
-                    if (!station.cooking) {
-                        startCooking(station.autoCookFood, stationId);
-                    }
+                    // Start cooking in all available slots
+                    fillAutoCookSlots(stationId);
                     showNotification(`Auto-cook enabled for ${foodData[select.value].name}!`, 'success');
                 } else {
                     e.currentTarget.checked = false;
@@ -252,8 +250,7 @@ function startCooking(foodType, stationId) {
     // Find an available cooking slot
     const availableSlot = station.cookingSlots.find(slot => !slot.cooking);
     if (!availableSlot) {
-        showNotification('All cooking slots are busy!', 'error');
-        return;
+        return; // Silently return if no slots available
     }
 
     const slotIndex = station.cookingSlots.indexOf(availableSlot);
@@ -264,7 +261,10 @@ function startCooking(foodType, stationId) {
     availableSlot.currentFood = foodType;
     availableSlot.progress = 0;
 
-    showNotification(`Started cooking ${food.name}!`, 'info');
+    // Only show notification if not auto-cooking
+    if (!station.autoCook) {
+        showNotification(`Started cooking ${food.name}!`, 'info');
+    }
 
     // Animate progress
     const startTime = Date.now();
@@ -284,6 +284,22 @@ function startCooking(foodType, stationId) {
     updateStationUI(stationId);
 }
 
+// Fill all available slots with auto-cook food
+function fillAutoCookSlots(stationId) {
+    const station = gameState.stations[stationId];
+
+    if (!station.autoCook || !station.autoCookFood) {
+        return;
+    }
+
+    // Start cooking in all available slots
+    station.cookingSlots.forEach(() => {
+        if (station.autoCook && station.autoCookFood) {
+            startCooking(station.autoCookFood, stationId);
+        }
+    });
+}
+
 function finishCooking(stationId, slotIndex) {
     const station = gameState.stations[stationId];
     const slot = station.cookingSlots[slotIndex];
@@ -294,19 +310,24 @@ function finishCooking(stationId, slotIndex) {
     updateInventoryUI();
     updateUI(); // Update serve buttons when inventory changes
 
-    showNotification(`${food.name} ready to serve!`, 'success');
+    // Only show notification if not auto-cooking
+    if (!station.autoCook) {
+        showNotification(`${food.name} ready to serve!`, 'success');
+    }
+
+    // Store the cooked food type before resetting
+    const cookedFoodType = slot.currentFood;
 
     // Reset slot
-    const cookedFood = slot.currentFood;
     slot.cooking = false;
     slot.currentFood = null;
     slot.progress = 0;
 
     updateStationUI(stationId);
 
-    // Auto-cook if enabled
+    // Auto-cook if enabled - immediately restart in this slot
     if (station.autoCook && station.autoCookFood) {
-        setTimeout(() => startCooking(station.autoCookFood, stationId), 500);
+        setTimeout(() => startCooking(station.autoCookFood, stationId), 300);
     }
 }
 
@@ -364,10 +385,12 @@ function unlockStation(stationId) {
     const unlockMessage = stationElement.querySelector('.unlock-message');
     const autoCookControls = stationElement.querySelector('.auto-cook-controls');
     const foodButtons = stationElement.querySelector('.food-buttons');
+    const stationIcon = stationElement.querySelector('.station-icon');
 
     if (unlockMessage) unlockMessage.style.display = 'none';
     if (autoCookControls) autoCookControls.style.display = 'flex';
     if (foodButtons) foodButtons.style.display = 'flex';
+    if (stationIcon) stationIcon.textContent = '👨‍🍳'; // Change to chef icon
 
     updateUI();
     showNotification('Station unlocked! You can now cook 3 items simultaneously!', 'success');
@@ -409,14 +432,14 @@ function autoServeCustomers() {
                     tableId: table.id,
                     foodType: customer.order
                 });
-
-                // Start processing queue if waiter is idle
-                if (gameState.waiter.status === 'idle') {
-                    processServingQueue();
-                }
             }
         }
     });
+
+    // Always try to process queue if there are items and waiter is idle
+    if (gameState.waiter.servingQueue.length > 0 && gameState.waiter.status === 'idle') {
+        processServingQueue();
+    }
 }
 
 // Inventory Management
@@ -931,10 +954,12 @@ function loadGame() {
                     const unlockMsg = station2.querySelector('.unlock-message');
                     const autoCook = station2.querySelector('.auto-cook-controls');
                     const foodButtons = station2.querySelector('.food-buttons');
+                    const stationIcon = station2.querySelector('.station-icon');
 
                     if (unlockMsg) unlockMsg.style.display = 'none';
                     if (autoCook) autoCook.style.display = 'flex';
                     if (foodButtons) foodButtons.style.display = 'flex';
+                    if (stationIcon) stationIcon.textContent = '👨‍🍳'; // Change to chef icon
                 }
             }
         }
