@@ -1019,12 +1019,12 @@ body {
     cursor: pointer;
     transform-style: preserve-3d;
     transition: all 0.3s ease;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.35));
 }
 
 .table:hover {
     transform: translateY(-8px) scale(1.05);
-    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.35));
+    filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.45));
 }
 
 .table-base {
@@ -1034,58 +1034,96 @@ body {
     transform-style: preserve-3d;
 }
 
-/* Table Legs */
+/* Table Legs - More realistic with 4 legs */
 .table-base::before,
 .table-base::after {
     content: '';
     position: absolute;
-    width: 8px;
-    height: 50px;
-    background: linear-gradient(135deg, #8b5a3c 0%, #6d4628 50%, #5a3821 100%);
-    border-radius: 2px;
+    width: 10px;
+    height: 55px;
+    background:
+        linear-gradient(90deg,
+            #4a3422 0%,
+            #6d4628 15%,
+            #8b5a3c 50%,
+            #6d4628 85%,
+            #4a3422 100%
+        );
+    border-radius: 3px;
     box-shadow:
-        inset -2px 0 4px rgba(0, 0, 0, 0.4),
-        inset 2px 0 3px rgba(139, 90, 60, 0.3),
-        2px 3px 6px rgba(0, 0, 0, 0.4);
+        inset -3px 0 5px rgba(0, 0, 0, 0.5),
+        inset 3px 0 4px rgba(139, 90, 60, 0.4),
+        3px 4px 8px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 0, 0, 0.3);
     top: 60px;
     z-index: -1;
 }
 
 .table-base::before {
-    left: 35%;
-    transform: translateX(-50%);
+    left: 30%;
+    transform: translateX(-50%) perspective(500px) rotateY(-8deg);
 }
 
 .table-base::after {
-    right: 35%;
-    transform: translateX(50%);
+    right: 30%;
+    transform: translateX(50%) perspective(500px) rotateY(8deg);
 }
 
-/* Table Top - Isometric */
+/* Table Top - Isometric with enhanced realism */
 .table-top {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
     background:
-        linear-gradient(90deg, rgba(139, 90, 60, 0.15) 1px, transparent 1px),
-        linear-gradient(rgba(139, 90, 60, 0.15) 1px, transparent 1px),
-        linear-gradient(135deg, #d9a066 0%, #d4a574 30%, #c4935e 60%, #b58353 100%);
-    background-size: 20px 20px, 20px 20px, 100% 100%;
-    border-radius: 15px;
+        /* Wood grain lines */
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 15px,
+            rgba(139, 90, 60, 0.08) 15px,
+            rgba(139, 90, 60, 0.08) 16px
+        ),
+        /* Subtle texture */
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 2px,
+            rgba(139, 90, 60, 0.03) 2px,
+            rgba(139, 90, 60, 0.03) 3px
+        ),
+        /* Main wood color gradient */
+        radial-gradient(
+            ellipse at 60% 40%,
+            #e6b886 0%,
+            #d9a066 20%,
+            #d4a574 40%,
+            #c4935e 70%,
+            #b58353 100%
+        );
+    border-radius: 18px;
     transform: rotateX(60deg) rotateZ(45deg);
     left: 50%;
-    top: 20px;
-    margin-left: -60px;
+    top: 15px;
+    margin-left: -65px;
     box-shadow:
-        0 10px 20px rgba(0, 0, 0, 0.3),
-        inset 0 3px 10px rgba(255, 255, 255, 0.4),
-        inset 0 -3px 10px rgba(0, 0, 0, 0.3),
-        inset -3px 0 8px rgba(0, 0, 0, 0.2),
-        inset 3px 0 8px rgba(255, 255, 255, 0.2);
-    border: 4px solid #a0724e;
+        /* Main shadow */
+        0 15px 30px rgba(0, 0, 0, 0.4),
+        /* Top highlight */
+        inset 0 4px 15px rgba(255, 255, 255, 0.5),
+        /* Bottom shadow */
+        inset 0 -4px 12px rgba(0, 0, 0, 0.4),
+        /* Left shadow */
+        inset -4px 0 10px rgba(0, 0, 0, 0.25),
+        /* Right highlight */
+        inset 4px 0 10px rgba(255, 255, 255, 0.25),
+        /* Outer border glow */
+        0 0 0 1px rgba(160, 114, 78, 0.8),
+        /* Outer edge shadow */
+        0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 5px solid #a0724e;
 }
 
-/* Wood grain effect */
+/* Enhanced wood grain effect */
 .table-top::before {
     content: '';
     position: absolute;
@@ -1094,14 +1132,29 @@ body {
     right: 0;
     bottom: 0;
     background:
+        /* Wood knots and details */
+        radial-gradient(circle at 30% 25%, rgba(139, 90, 60, 0.15) 0%, transparent 8%),
+        radial-gradient(circle at 70% 60%, rgba(139, 90, 60, 0.12) 0%, transparent 10%),
+        radial-gradient(circle at 50% 80%, rgba(139, 90, 60, 0.1) 0%, transparent 6%),
+        /* Grain direction */
         repeating-linear-gradient(
-            90deg,
+            88deg,
             transparent,
-            transparent 10px,
-            rgba(139, 90, 60, 0.1) 10px,
-            rgba(139, 90, 60, 0.1) 11px
+            transparent 18px,
+            rgba(139, 90, 60, 0.06) 18px,
+            rgba(139, 90, 60, 0.06) 20px,
+            transparent 20px,
+            transparent 25px
+        ),
+        /* Glossy shine effect */
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.3) 0%,
+            transparent 30%,
+            transparent 70%,
+            rgba(0, 0, 0, 0.1) 100%
         );
-    border-radius: 11px;
+    border-radius: 13px;
     pointer-events: none;
 }
 
@@ -2007,11 +2060,11 @@ body {
 /* Food Storage Area */
 .food-storage-area {
     margin-top: 20px;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    padding: 20px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    padding: 25px;
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border: 3px solid #81c784;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 3px solid #c0c0c0;
 }
 
 .storage-header {
@@ -2020,52 +2073,81 @@ body {
     justify-content: center;
     gap: 10px;
     font-weight: bold;
-    font-size: 1.3em;
+    font-size: 1.4em;
     color: var(--dark);
-    margin-bottom: 15px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #66bb6a;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-bottom: 3px solid #a0a0a0;
 }
 
 .storage-icon {
-    font-size: 1.8em;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+    font-size: 2em;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .storage-tables-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    perspective: 1000px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px;
+    perspective: 1200px;
 }
 
 .storage-table {
     position: relative;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    background:
+        /* Wood grain texture */
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 12px,
+            rgba(139, 90, 60, 0.05) 12px,
+            rgba(139, 90, 60, 0.05) 13px
+        ),
+        /* Main wood color */
+        linear-gradient(135deg, #e6b886 0%, #d9a066 30%, #c4935e 100%);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.3),
+        inset 0 2px 8px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.2);
     transform-style: preserve-3d;
     transition: all 0.3s ease;
-    border: 3px solid #4caf50;
-    min-height: 180px;
+    border: 4px solid #a0724e;
+    min-height: 200px;
 }
 
 .storage-table:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.4),
+        inset 0 2px 8px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .storage-table-top {
     position: absolute;
-    top: -6px;
-    left: 0;
-    right: 0;
-    height: 12px;
-    background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
-    border-radius: 12px 12px 0 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
-    transform: rotateX(45deg);
+    top: -8px;
+    left: 5px;
+    right: 5px;
+    height: 15px;
+    background:
+        linear-gradient(90deg,
+            #8b5a3c 0%,
+            #a0724e 30%,
+            #b58353 50%,
+            #a0724e 70%,
+            #8b5a3c 100%
+        );
+    border-radius: 15px 15px 0 0;
+    box-shadow:
+        0 -3px 10px rgba(0, 0, 0, 0.3),
+        inset 0 2px 6px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    transform: rotateX(50deg);
     transform-origin: bottom;
     z-index: 1;
 }
@@ -2073,58 +2155,77 @@ body {
 .storage-label {
     text-align: center;
     font-weight: bold;
-    font-size: 1.1em;
-    color: var(--dark);
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #e8f5e9;
+    font-size: 1.2em;
+    color: #4a3422;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(160, 114, 78, 0.3);
 }
 
 .storage-foods {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-height: 100px;
+    gap: 12px;
+    min-height: 120px;
     align-items: center;
     justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .storage-placeholder {
-    color: #999;
+    color: #8b6f47;
     font-style: italic;
     text-align: center;
-    padding: 20px;
-    font-size: 0.95em;
+    padding: 25px;
+    font-size: 1em;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .storage-food-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, #fff 0%, #f1f8e9 100%);
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    gap: 12px;
+    padding: 12px 16px;
+    background:
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(255, 250, 240, 0.95) 100%
+        );
+    border-radius: 12px;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 3px rgba(255, 255, 255, 0.8);
     width: 100%;
     transition: all 0.3s ease;
-    border: 2px solid #aed581;
+    border: 3px solid rgba(255, 193, 7, 0.6);
 }
 
 .storage-food-item:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: scale(1.08);
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.3),
+        inset 0 1px 3px rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 193, 7, 0.9);
 }
 
 .storage-food-item .food-3d {
-    transform: scale(0.6);
+    transform: scale(0.65);
     flex-shrink: 0;
 }
 
 .storage-food-count {
     font-weight: bold;
-    font-size: 1.2em;
-    color: #2e7d32;
+    font-size: 1.4em;
+    color: #d84315;
     margin-left: auto;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 @media (max-width: 768px) {

@@ -6,9 +6,9 @@ const gameState = {
     inventory: [], // Keep for backwards compatibility but will use storage tables
     tables: [],
     storageTables: [
-        { id: 0, foods: [] },
-        { id: 1, foods: [] },
-        { id: 2, foods: [] }
+        { id: 0, foods: [], foodType: null }, // null = empty, can accept any food
+        { id: 1, foods: [], foodType: null },
+        { id: 2, foods: [], foodType: null }
     ],
     stations: {
         1: {
@@ -330,15 +330,20 @@ function finishCooking(stationId, slotIndex) {
     const station = gameState.stations[stationId];
     const slot = station.cookingSlots[slotIndex];
     const food = foodData[slot.currentFood];
+    const foodType = slot.currentFood;
 
-    // Add to storage table (round robin distribution)
-    const storageTable = findAvailableStorageTable();
+    // Add to storage table (only one food type per table)
+    const storageTable = findAvailableStorageTable(foodType);
     if (storageTable) {
-        storageTable.foods.push(slot.currentFood);
+        storageTable.foods.push(foodType);
+        // Set the food type if it's the first item
+        if (storageTable.foodType === null) {
+            storageTable.foodType = foodType;
+        }
         updateStorageTablesUI();
     } else {
         // Fallback to inventory if storage is full
-        gameState.inventory.push(slot.currentFood);
+        gameState.inventory.push(foodType);
         updateInventoryUI();
     }
 
@@ -348,9 +353,6 @@ function finishCooking(stationId, slotIndex) {
     if (!station.autoCook) {
         showNotification(`${food.name} placed on storage table!`, 'success');
     }
-
-    // Store the cooked food type before resetting
-    const cookedFoodType = slot.currentFood;
 
     // Reset slot
     slot.cooking = false;
@@ -365,16 +367,23 @@ function finishCooking(stationId, slotIndex) {
     }
 }
 
-// Find storage table with least food (load balancing)
-function findAvailableStorageTable() {
-    let minTable = gameState.storageTables[0];
-    gameState.storageTables.forEach(table => {
-        if (table.foods.length < minTable.foods.length) {
-            minTable = table;
-        }
-    });
-    // Limit 10 items per storage table
-    return minTable.foods.length < 10 ? minTable : null;
+// Find storage table for specific food type (only one food type per table)
+function findAvailableStorageTable(foodType) {
+    // First, look for a table that already has this food type
+    let existingTable = gameState.storageTables.find(table =>
+        table.foodType === foodType && table.foods.length < 10
+    );
+
+    if (existingTable) {
+        return existingTable;
+    }
+
+    // If no existing table, find an empty table
+    let emptyTable = gameState.storageTables.find(table =>
+        table.foodType === null || table.foods.length === 0
+    );
+
+    return emptyTable || null;
 }
 
 // Update station UI to show all cooking slots
@@ -507,34 +516,40 @@ function updateStorageTablesUI() {
         const tableElement = document.getElementById(`storage-table-${index}`);
         if (!tableElement) return;
 
+        const labelElement = tableElement.querySelector('.storage-label');
         const foodsContainer = tableElement.querySelector('.storage-foods');
         if (!foodsContainer) return;
+
+        // Update label to show food type
+        if (labelElement) {
+            if (table.foodType) {
+                const foodIcon = foodData[table.foodType].icon;
+                labelElement.textContent = `${foodIcon} ${foodData[table.foodType].name} Table`;
+            } else {
+                labelElement.textContent = `Table ${index + 1}`;
+            }
+        }
 
         foodsContainer.innerHTML = '';
 
         if (table.foods.length === 0) {
             foodsContainer.innerHTML = '<div class="storage-placeholder">Empty</div>';
+            // Reset food type when empty
+            table.foodType = null;
+            if (labelElement) {
+                labelElement.textContent = `Table ${index + 1}`;
+            }
             return;
         }
 
-        // Count foods
-        const foodCount = {};
-        table.foods.forEach(food => {
-            foodCount[food] = (foodCount[food] || 0) + 1;
-        });
-
-        // Display food counts
-        Object.keys(foodCount).forEach(foodType => {
-            const div = document.createElement('div');
-            div.className = 'storage-food-item';
-            div.innerHTML = `
-                <div style="transform: scale(0.5); display: inline-block;">
-                    ${get3DFoodHTML(foodType)}
-                </div>
-                <span class="food-count">x${foodCount[foodType]}</span>
-            `;
-            foodsContainer.appendChild(div);
-        });
+        // Display single food type with count
+        const div = document.createElement('div');
+        div.className = 'storage-food-item';
+        div.innerHTML = `
+            ${get3DFoodHTML(table.foodType)}
+            <span class="storage-food-count">×${table.foods.length}</span>
+        `;
+        foodsContainer.appendChild(div);
     });
 }
 
