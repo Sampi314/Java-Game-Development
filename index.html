@@ -1,95 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant City - Rebuild</title>
+    <title>Restaurant City</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <!-- Top Stats Bar -->
-        <header class="top-bar">
-            <div class="stat">
-                <span class="stat-icon">💰</span>
-                <span class="stat-label">Money:</span>
-                <span id="money" class="stat-value">500</span>
-            </div>
-            <div class="stat">
-                <span class="stat-icon">⭐</span>
-                <span class="stat-label">Level:</span>
-                <span id="level" class="stat-value">1</span>
-            </div>
-            <div class="stat">
-                <span class="stat-icon">👥</span>
-                <span class="stat-label">Customers:</span>
-                <span id="customers" class="stat-value">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-icon">⭐</span>
-                <span class="stat-label">Rating:</span>
-                <span id="rating" class="stat-value">5.0</span>
-            </div>
-        </header>
-
-        <!-- Main Game View -->
-        <div class="game-view">
-            <!-- Restaurant Floor -->
-            <div class="restaurant" id="restaurant">
-                <!-- Kitchen Area -->
-                <div class="kitchen-area">
-                    <div class="kitchen-station">
-                        <div class="station-label">🍳 Kitchen</div>
-                        <div class="cooking-buttons">
-                            <button class="cook-btn" onclick="cookFood('burger')">🍔 Burger ($15)</button>
-                            <button class="cook-btn" onclick="cookFood('pizza')">🍕 Pizza ($25)</button>
-                            <button class="cook-btn" onclick="cookFood('coffee')">☕ Coffee ($10)</button>
-                        </div>
-                        <div id="cookingStatus" class="cooking-status"></div>
-                    </div>
-                    <div class="food-storage">
-                        <div class="storage-label">📦 Ready Food</div>
-                        <div id="foodInventory" class="food-items"></div>
-                    </div>
-                </div>
-
-                <!-- Dining Area with Tables -->
-                <div class="dining-area" id="diningArea">
-                    <!-- Tables will be generated here -->
-                </div>
-
-                <!-- Staff Characters -->
-                <div class="staff-container">
-                    <div class="staff server" id="server" style="left: 30%; top: 50%;">
-                        <div class="staff-icon">👔</div>
-                        <div class="staff-label">Server</div>
-                    </div>
-                    <div class="staff cook" id="cook" style="left: 10%; top: 20%;">
-                        <div class="staff-icon">👨‍🍳</div>
-                        <div class="staff-label">Cook</div>
-                    </div>
-                    <div class="staff cleaner" id="cleaner" style="left: 70%; top: 50%;">
-                        <div class="staff-icon">🧹</div>
-                        <div class="staff-label">Cleaner</div>
-                    </div>
-                </div>
-            </div>
+    <div class="game">
+        <div class="header">
+            <div>💰 Money: $<span id="money">100</span></div>
+            <div>⭐ Level: <span id="level">1</span></div>
         </div>
 
-        <!-- Bottom Control Panel -->
-        <div class="control-panel">
-            <button class="panel-btn" onclick="hireStaff()">👥 Hire Staff</button>
-            <button class="panel-btn" onclick="addTable()">🪑 Add Table ($100)</button>
-            <button class="panel-btn" onclick="showRecipes()">📖 Recipes</button>
-            <button class="panel-btn" onclick="toggleAutoServe()">
-                <span id="autoServeText">🤖 Auto-Serve: OFF</span>
-            </button>
+        <div class="restaurant">
+            <div class="kitchen">
+                <h3>Kitchen</h3>
+                <button onclick="cook('burger')">Cook Burger 🍔</button>
+                <button onclick="cook('pizza')">Cook Pizza 🍕</button>
+                <div id="inventory"></div>
+            </div>
+
+            <div class="tables" id="tables"></div>
         </div>
     </div>
-
-    <!-- Notification Area -->
-    <div id="notifications" class="notifications"></div>
-
     <script src="game.js"></script>
 </body>
 </html>
