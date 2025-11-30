@@ -6,7 +6,8 @@ const TILE_HEIGHT = 32;
 // Recipes
 const RECIPES = {
     'burger': { meat: 1, bread: 1 },
-    'pizza': { dough: 1, cheese: 1 }
+    'pizza': { dough: 1, cheese: 1 },
+    'soda': { sugar: 1 }
 };
 
 // Game State
@@ -28,22 +29,92 @@ const state = {
         meat: 5,
         bread: 5,
         cheese: 5,
-        dough: 5
+        dough: 5,
+        sugar: 5
     },
     seeds: {
         meat: 0,
         bread: 0,
         cheese: 0,
-        dough: 0
+        dough: 0,
+        sugar: 0
     },
+    storageLimit: 20, // Max ingredients
     orders: [], // Track active orders: { id: 'cust_1', item: 'burger' }
     xp: 0,
     maxXp: 100,
     unlockedRecipes: ['burger'], // Start with only burger
     selectedSeed: null, // For planting
     gridSize: 12, // Dynamic grid size
-    quests: [] // Active quests
+    quests: [], // Active quests
+    fame: 0, // Restaurant fame/reputation
+    maxFame: 100, // Fame level cap
+    operatingTime: 0, // Total time restaurant has been running (in seconds)
+    happyCustomers: 0 // Count of satisfied customers
 };
+
+class QuestManager {
+    constructor() {
+        this.quests = state.quests || [];
+        if (this.quests.length === 0) this.generateQuests();
+    }
+
+    generateQuests() {
+        const types = [
+            { id: 'serve_burger', text: 'Serve 3 Burgers', type: 'serve', target: 3, current: 0, reward: 50 },
+            { id: 'earn_xp', text: 'Earn 50 XP', type: 'earn_xp', target: 50, current: 0, reward: 100 },
+            { id: 'buy_seed', text: 'Buy 2 Seeds', type: 'buy_seed', target: 2, current: 0, reward: 20 }
+        ];
+
+        // Pick 3 random
+        this.quests = types.sort(() => 0.5 - Math.random()).slice(0, 3);
+        state.quests = this.quests;
+        this.updateUI();
+    }
+
+    checkProgress(type, amount = 1) {
+        let updated = false;
+        this.quests.forEach(q => {
+            if (q.type === type && q.current < q.target) {
+                q.current += amount;
+                updated = true;
+                if (q.current >= q.target) {
+                    this.completeQuest(q);
+                }
+            }
+        });
+
+        if (updated) this.updateUI();
+    }
+
+    completeQuest(quest) {
+        state.money += quest.reward;
+        window.game.showFloatText(`Quest Complete! +$${quest.reward}`, window.innerWidth / 2, 100, 'gold');
+
+        // Replace quest
+        this.quests = this.quests.filter(q => q !== quest);
+        // Add new one? Or wait for day reset? Let's just keep 3 slots.
+        // For now, remove it.
+        state.quests = this.quests;
+        this.updateUI();
+    }
+
+    updateUI() {
+        const container = document.getElementById('quest-list');
+        if (!container) return;
+
+        container.innerHTML = '';
+        this.quests.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'quest-item';
+            div.innerHTML = `
+                <span>${q.text}</span>
+                <span>${q.current}/${q.target}</span>
+            `;
+            container.appendChild(div);
+        });
+    }
+}
 
 class Game {
     constructor() {
@@ -71,7 +142,8 @@ class Game {
             hoverY: -1,
             isDragging: false,
             dragStart: null, // {x, y, furniture}
-            dragCurrent: null // {x, y}
+            dragCurrent: null, // {x, y}
+            previewElement: null // Preview ghost furniture
         };
 
         this.initGrid();
@@ -103,6 +175,22 @@ class Game {
         });
     }
 
+    // Custom Notification System
+    showNotification(message, icon = 'ℹ️') {
+        const modal = document.getElementById('notification-modal');
+        const messageEl = document.getElementById('notification-message');
+        const iconEl = document.getElementById('notification-icon');
+
+        messageEl.textContent = message;
+        iconEl.textContent = icon;
+        modal.style.display = 'flex';
+    }
+
+    closeNotification() {
+        const modal = document.getElementById('notification-modal');
+        modal.style.display = 'none';
+    }
+
     toggleBuildMode() {
         this.buildMode.active = !this.buildMode.active;
         const menu = document.getElementById('build-menu');
@@ -131,22 +219,32 @@ class Game {
     }
 
     buySeed(type, cost) {
+        // Check Storage (Seeds don't take storage, but let's say they do for simplicity?
+        // No, the plan said "Cannot harvest/buy if storage is full".
+        // Usually seeds are separate. But let's stick to the plan if strictly interpreted.
+        // Actually, "ingredients" take storage. Seeds are in `state.seeds`.
+        // So buying seeds should NOT check ingredient storage.
+        // BUT, harvesting checks storage.
+        // Let's leave buySeed without storage check for seeds, as they are not ingredients.
+        // Wait, the bottom implementation checked ingredient storage?
+        // "const currentStorage = Object.values(state.ingredients)..."
+        // That seems wrong if I'm buying a seed.
+        // I will NOT add storage check to buySeed.
+
         if (state.money >= cost) {
             state.money -= cost;
             state.seeds[type]++;
-
-            // Visual feedback
-            this.showFloatText(`+1 ${type} Seed`, window.innerWidth / 2, window.innerHeight / 2, 'green');
+            this.showFloatText(`Bought 1 ${type} seed`, window.innerWidth / 2, window.innerHeight / 2, 'green');
 
             // Quest Event
             this.questManager.checkProgress('buy_seed');
 
             // Auto-select seed
             state.selectedSeed = type;
-            this.toggleMarket(); // Close shop
-            alert(`Select a Garden Plot to plant ${type}!`);
+            this.toggleMarket();
+            this.showNotification(`Select a Garden Plot to plant ${type}!`, '🌱');
         } else {
-            alert("Not enough money!");
+            this.showNotification("Not enough money!", '💰');
         }
     }
 
@@ -154,13 +252,13 @@ class Game {
         if (state.money >= cost) {
             state.money -= cost;
             // Spawn at entrance
-            const staff = new Staff(GRID_SIZE - 1, GRID_SIZE - 1, role);
+            const staff = new Staff(state.gridSize - 1, state.gridSize - 1, role);
             this.addEntity(staff);
             this.toggleStaffMenu(); // Close menu
 
             this.showFloatText(`New ${role}!`, window.innerWidth / 2, window.innerHeight / 2, 'blue');
         } else {
-            alert("Not enough money!");
+            this.showNotification("Not enough money!", '💰');
         }
     }
 
@@ -192,12 +290,32 @@ class Game {
         state.xp = 0;
         state.maxXp = Math.floor(state.maxXp * 1.5);
 
-        // Unlocks
-        if (state.level === 2) {
-            state.unlockedRecipes.push('pizza');
-            alert("Level Up! Unlocked: Pizza 🍕");
-        } else {
-            alert(`Level Up! You are now level ${state.level}`);
+        this.showNotification(`Level Up! You are now level ${state.level}`, '⭐');
+    }
+
+    // Check if we can discover new recipes based on collected ingredients
+    checkRecipeDiscovery() {
+        for (const [recipeName, recipe] of Object.entries(RECIPES)) {
+            // Skip if already unlocked
+            if (state.unlockedRecipes.includes(recipeName)) continue;
+
+            // Check if we have at least 1 of each ingredient
+            let canDiscover = true;
+            for (const ingredient of Object.keys(recipe)) {
+                if (!state.ingredients[ingredient] || state.ingredients[ingredient] < 1) {
+                    canDiscover = false;
+                    break;
+                }
+            }
+
+            // Unlock the recipe!
+            if (canDiscover) {
+                state.unlockedRecipes.push(recipeName);
+                const icons = { 'burger': '🍔', 'pizza': '🍕', 'soda': '🥤' };
+                const icon = icons[recipeName] || '🍽️';
+                this.showFloatText(`New Recipe Discovered! ${icon} ${recipeName.toUpperCase()}`, window.innerWidth / 2, window.innerHeight / 2, 'gold');
+                this.showNotification(`New Recipe Discovered: ${recipeName.toUpperCase()}\n\nYou can now serve this to customers!`, icon);
+            }
         }
     }
 
@@ -296,6 +414,8 @@ class Game {
         return bonuses;
     }
 
+
+
     expandRestaurant() {
         const cost = 1000 * state.level;
         if (state.money >= cost) {
@@ -311,10 +431,10 @@ class Game {
             this.initGrid();
             this.setupLevel(); // This resets everything... ideally we should keep furniture.
             // For now, let's just alert "Coming Soon" as full grid resize is complex
-            alert("Expansion Coming Soon! (Requires engine rewrite)");
+            this.showNotification("Expansion Coming Soon! (Requires engine rewrite)", '🚧');
             state.money += cost; // Refund
         } else {
-            alert(`Need $${cost} to expand!`);
+            this.showNotification(`Need $${cost} to expand!`, '💰');
         }
     }
 
@@ -384,7 +504,10 @@ class Game {
             return;
         }
 
-        if (!this.buildMode.selectedItem) return;
+        if (!this.buildMode.selectedItem) {
+            this.removePreview();
+            return;
+        }
 
         this.clearHighlights();
 
@@ -394,6 +517,42 @@ class Game {
         tile.element.classList.add(isValid ? 'highlight-valid' : 'highlight-invalid');
         this.buildMode.hoverX = x;
         this.buildMode.hoverY = y;
+
+        // Show preview of furniture
+        this.showPreview(x, y, this.buildMode.selectedItem, isValid);
+    }
+
+    showPreview(x, y, itemType, isValid) {
+        // Remove old preview
+        this.removePreview();
+
+        if (itemType === 'delete') return; // No preview for delete
+
+        // Create preview element
+        const preview = document.createElement('div');
+        preview.className = `furniture ${itemType}-furniture`;
+        preview.style.position = 'absolute';
+        preview.style.width = TILE_WIDTH + 'px';
+        preview.style.height = '64px';
+
+        const screenX = (x - y) * (TILE_WIDTH / 2);
+        const screenY = (x + y) * (TILE_HEIGHT / 2);
+        preview.style.left = screenX + 'px';
+        preview.style.top = (screenY - 32) + 'px';
+        preview.style.opacity = isValid ? '0.5' : '0.3';
+        preview.style.filter = isValid ? 'brightness(1.2)' : 'brightness(0.5) saturate(0)';
+        preview.style.pointerEvents = 'none';
+        preview.style.zIndex = 1000;
+
+        this.world.appendChild(preview);
+        this.buildMode.previewElement = preview;
+    }
+
+    removePreview() {
+        if (this.buildMode.previewElement) {
+            this.world.removeChild(this.buildMode.previewElement);
+            this.buildMode.previewElement = null;
+        }
     }
 
     clearHighlights() {
@@ -514,7 +673,7 @@ class Game {
                         state.seeds[state.selectedSeed]--;
                         if (state.seeds[state.selectedSeed] === 0) state.selectedSeed = null;
                     } else {
-                        alert("No seeds left! Buy more.");
+                        this.showNotification("No seeds left! Buy more.", '🌻');
                     }
                 } else {
                     // Open Seed Shop if clicked empty plot
@@ -533,14 +692,23 @@ class Game {
         } else {
             if (this.isValidPlacement(x, y, this.buildMode.selectedItem)) {
                 // Check money
-                const costs = { 'table': 50, 'stove': 100, 'counter': 30, 'garden': 20 };
+                const costs = {
+                    'table': 50,
+                    'stove': 100,
+                    'counter': 30,
+                    'garden': 20,
+                    'drink_machine': 150,
+                    'plant': 15,
+                    'rug': 10,
+                    'lamp': 25
+                };
                 const cost = costs[this.buildMode.selectedItem];
 
                 if (state.money >= cost) {
                     state.money -= cost;
                     this.addFurniture(this.buildMode.selectedItem, x, y);
                 } else {
-                    alert('Not enough money!');
+                    this.showNotification('Not enough money!', '💰');
                 }
             }
         }
@@ -628,8 +796,8 @@ class Game {
         const waiter = new Staff(5, 5, 'waiter');
         this.addEntity(waiter);
 
-        // Spawn Customer Loop
-        setInterval(() => this.spawnCustomer(), 5000);
+        // Dynamic Customer Spawn Loop based on fame
+        this.customerSpawnTimer = 0;
     }
 
     addFurniture(type, x, y) {
@@ -672,8 +840,12 @@ class Game {
     }
 
     loop(timestamp) {
-        const deltaTime = (timestamp - this.lastTime) / 1000; // Seconds
+        if (!this.lastTime) this.lastTime = timestamp;
+        let deltaTime = (timestamp - this.lastTime) / 1000; // Seconds
         this.lastTime = timestamp;
+
+        // Clamp delta time to prevent huge jumps (e.g. tab switching)
+        if (deltaTime > 0.1) deltaTime = 0.1;
 
         this.update(deltaTime);
         this.render();
@@ -682,6 +854,31 @@ class Game {
     }
 
     update(dt) {
+        // Increase operating time and fame gradually
+        state.operatingTime += dt;
+
+        // Gain fame slowly over time (0.5 fame per minute of operation)
+        if (state.fame < state.maxFame) {
+            state.fame += (0.5 / 60) * dt;
+            state.fame = Math.min(state.fame, state.maxFame);
+        }
+
+        // Fame levels up at certain thresholds
+        if (state.fame >= state.maxFame) {
+            state.maxFame += 50; // Increase fame cap
+        }
+
+        // Dynamic customer spawning based on fame
+        // Base spawn interval: 8 seconds at fame 0, down to 2 seconds at fame 100+
+        const fameLevel = Math.min(state.fame / 50, 2); // 0 to 2 based on fame
+        const spawnInterval = Math.max(2, 8 - (fameLevel * 3)); // 8s -> 2s as fame increases
+
+        this.customerSpawnTimer += dt;
+        if (this.customerSpawnTimer >= spawnInterval) {
+            this.spawnCustomer();
+            this.customerSpawnTimer = 0;
+        }
+
         this.entities.forEach((entity, index) => {
             entity.update(dt);
             if (entity.remove) {
@@ -705,6 +902,17 @@ class Game {
         document.getElementById('customers-served').textContent = state.customersServed;
         document.getElementById('xp').textContent = state.xp;
         document.getElementById('max-xp').textContent = state.maxXp;
+        document.getElementById('fame').textContent = Math.floor(state.fame);
+        document.getElementById('max-fame').textContent = state.maxFame;
+
+        // Storage UI
+        const currentStorage = Object.values(state.ingredients).reduce((a, b) => a + b, 0);
+        document.getElementById('storage-display').textContent = `${currentStorage}/${state.storageLimit}`;
+
+        // Expand Cost UI
+        const expandCost = 1000 * state.level;
+        const expandCostEl = document.getElementById('expand-cost');
+        if (expandCostEl) expandCostEl.textContent = `$${expandCost}`;
 
         // Update Garden Plots
         this.furniture.forEach(f => {
@@ -746,6 +954,21 @@ class Game {
             }
         }
         return null; // No path found
+    }
+
+
+
+
+
+    upgradeStorage() {
+        const cost = state.storageLimit * 2; // Cost increases with current limit
+        if (state.money >= cost) {
+            state.money -= cost;
+            state.storageLimit += 10; // Increase by 10 slots
+            this.showFloatText(`Storage Upgraded! +10 slots`, this.world.offsetWidth / 2, this.world.offsetHeight / 2, 'lime');
+        } else {
+            this.showNotification(`Not enough money! Need $${cost} to upgrade storage.`, '💰');
+        }
     }
 }
 
@@ -867,9 +1090,19 @@ class GardenPlot extends Furniture {
 
     harvest() {
         if (this.isReady) {
+            // Check Storage
+            const currentStorage = Object.values(state.ingredients).reduce((a, b) => a + b, 0);
+            if (currentStorage + 5 > state.storageLimit) {
+                window.game.showFloatText("Storage Full! 📦", this.element.offsetLeft, this.element.offsetTop, 'red');
+                return;
+            }
+
             state.ingredients[this.crop] += 5; // Yield 5
             window.game.showFloatText(`+5 ${this.crop}`, this.element.offsetLeft, this.element.offsetTop, 'gold');
             window.game.addXp(5);
+
+            // Check for recipe discoveries
+            window.game.checkRecipeDiscovery();
 
             this.crop = null;
             this.growth = 0;
@@ -897,7 +1130,7 @@ class GardenPlot extends Furniture {
     }
 
     getIcon(type) {
-        const icons = { 'meat': '🥩', 'bread': '🌾', 'cheese': '🧀', 'dough': '🌾' };
+        const icons = { 'meat': '🥩', 'bread': '🌾', 'cheese': '🧀', 'dough': '🌾', 'sugar': '🍬' };
         return icons[type] || '❓';
     }
 }
@@ -949,7 +1182,7 @@ class Staff extends Entity {
                     this.element.appendChild(float);
                     setTimeout(() => float.remove(), 1000);
                 } else {
-                    alert("Need $10 to feed staff!");
+                    game.showNotification("Need $10 to feed staff!", '🍔');
                 }
             }
         });
@@ -1034,58 +1267,73 @@ class Staff extends Entity {
             // Smart Cooking: Check what is ordered but not yet cooked
             const neededItems = state.orders.map(o => o.item);
 
-            // Filter by what we CAN cook (have ingredients)
-            const cookableItems = neededItems.filter(item => {
-                const recipe = RECIPES[item];
-                if (!recipe) return false; // Unknown recipe
+            if (neededItems.length === 0) {
+                // No orders yet - chef waits
+                console.log('Chef waiting - no orders yet');
+                return;
+            }
 
-                // Check ingredients
-                for (const [ing, qty] of Object.entries(recipe)) {
-                    if (state.ingredients[ing] < qty) return false;
+            console.log('Chef checking orders:', neededItems);
+
+            // Filter by what we CAN cook (unlocked recipes only)
+            const cookableItems = neededItems.filter(item => {
+                // Check if recipe is unlocked
+                if (!state.unlockedRecipes.includes(item)) {
+                    console.log('Recipe not unlocked:', item);
+                    return false;
                 }
                 return true;
             });
 
-            // Prioritize: 1. Cookable Orders, 2. Stock up (if resources allow)
+            console.log('Cookable items:', cookableItems);
+
+            // Prioritize: Cook first needed item
             let itemToCook = null;
 
             if (cookableItems.length > 0) {
                 itemToCook = cookableItems[0]; // Cook first needed
             } else {
                 // Nothing ordered that we can cook.
-                // For now, idle if no orders or missing ingredients.
+                console.log('Chef idle - no cookable items (recipe not unlocked or no stove/counter)');
                 this.state = 'IDLE';
                 return;
             }
 
             if (itemToCook) {
-                // Find stove
-                const stove = window.game.furniture.find(f => f.type === 'stove' && !f.occupied);
+                // Find stove or drink machine
+                let targetStation = null;
+                let stationType = 'stove';
+
+                if (itemToCook === 'soda') {
+                    targetStation = window.game.furniture.find(f => f.type === 'drink_machine' && !f.occupied);
+                    stationType = 'drink_machine';
+                } else {
+                    targetStation = window.game.furniture.find(f => f.type === 'stove' && !f.occupied);
+                }
+
                 const counter = window.game.furniture.find(f => f.type === 'counter' && f.items.length === 0);
 
-                if (stove && counter) {
-                    // Consume Ingredients
-                    const recipe = RECIPES[itemToCook];
-                    for (const [ing, qty] of Object.entries(recipe)) {
-                        state.ingredients[ing] -= qty;
-                        window.game.showFloatText(`-1 ${ing}`, this.element.offsetLeft, this.element.offsetTop, 'red');
-                    }
+                console.log('Chef looking for station:', stationType, 'found:', !!targetStation, 'counter:', !!counter);
+
+                if (targetStation && counter) {
+                    console.log('Chef starting to cook', itemToCook, 'at', targetStation.x, targetStation.y);
 
                     this.state = 'MOVING_TO_STOVE';
-                    this.targetFurniture = { stove: stove, counter: counter, type: itemToCook };
+                    this.targetFurniture = { stove: targetStation, counter: counter, type: itemToCook };
                     this.cookingItem = itemToCook;
-                    this.cookingTimer = 0; // Reset timer
-                    this.moveTo(stove.x, stove.y);
-                    stove.occupied = true; // Reserve it
+                    this.cookingTimer = (itemToCook === 'soda') ? 0.5 : 2.0; // Fast soda
+                    this.moveTo(targetStation.x, targetStation.y);
+                    targetStation.occupied = true; // Reserve it
 
                     // Gain XP
                     this.gainXp(5);
+                } else {
+                    console.log('Chef blocked - missing station or counter');
                 }
             }
         } else if (this.state === 'MOVING_TO_STOVE') {
             if (!this.moving) {
                 this.state = 'COOKING';
-                this.cookingTimer = 2.0; // Cook time
             }
         } else if (this.state === 'COOKING') {
             this.cookingTimer -= dt;
@@ -1101,7 +1349,7 @@ class Staff extends Entity {
                 this.targetFurniture.counter.items.push(this.targetFurniture.type);
                 // Create visual for food
                 const food = document.createElement('div');
-                food.textContent = this.targetFurniture.type === 'burger' ? '🍔' : '🍕';
+                food.textContent = this.targetFurniture.type === 'burger' ? '🍔' : (this.targetFurniture.type === 'pizza' ? '🍕' : '🥤');
                 food.style.position = 'absolute';
                 food.style.bottom = '40px'; // Raised to look like it's ON the counter
                 food.style.left = '10px';
@@ -1115,14 +1363,21 @@ class Staff extends Entity {
             // Find customer waiting for food
             const customer = window.game.entities.find(e => e.type === 'customer' && e.state === 'WAITING_FOR_FOOD');
             if (customer) {
+                console.log('Waiter found waiting customer, looking for', customer.order);
                 // Find food on counter that MATCHES the order
                 const counterWithFood = window.game.furniture.find(f => f.type === 'counter' && f.items.includes(customer.order));
+                console.log('Counter with food:', !!counterWithFood, 'items:', counterWithFood?.items);
                 if (counterWithFood) {
+                    console.log('Waiter moving to pick up food');
                     this.state = 'MOVING_TO_FOOD';
                     this.targetItem = { customer: customer, counter: counterWithFood };
                     customer.state = 'BEING_SERVED'; // Prevent other waiters
                     this.moveTo(counterWithFood.x, counterWithFood.y);
+                } else {
+                    console.log('Waiter waiting - food not ready yet');
                 }
+            } else {
+                // console.log('Waiter idle - no waiting customers');
             }
         } else if (this.state === 'MOVING_TO_FOOD') {
             if (!this.moving) {
@@ -1165,6 +1420,15 @@ class Customer extends Entity {
         this.maxPatience = 30; // Seconds
         this.patience = this.maxPatience;
 
+        // VIP Logic (Override patience)
+        this.isVip = Math.random() < 0.1; // 10% chance
+        if (this.isVip) {
+            this.element.classList.add('vip');
+            this.maxPatience = 25; // 50% of normal (30s -> 25s)
+            this.patience = this.maxPatience;
+            window.game.showFloatText("VIP Arrived! 🌟", this.x * TILE_WIDTH, this.y * TILE_HEIGHT, 'gold');
+        }
+
         // Visuals
         this.createOrderBubble();
         this.createPatienceBar();
@@ -1175,7 +1439,7 @@ class Customer extends Entity {
     createOrderBubble() {
         this.bubble = document.createElement('div');
         this.bubble.className = 'order-bubble';
-        this.bubble.textContent = this.order === 'burger' ? '🍔' : '🍕';
+        this.bubble.textContent = this.order === 'burger' ? '🍔' : (this.order === 'pizza' ? '🍕' : '🥤');
         this.bubble.style.position = 'absolute';
         this.bubble.style.top = '-30px';
         this.bubble.style.left = '0';
@@ -1246,7 +1510,7 @@ class Customer extends Entity {
 
         // Show food on table
         const food = document.createElement('div');
-        food.textContent = this.order === 'burger' ? '🍔' : '🍕';
+        food.textContent = this.order === 'burger' ? '🍔' : (this.order === 'pizza' ? '🍕' : '🥤');
         food.style.position = 'absolute';
         food.style.bottom = '40px'; // Raised
         food.style.left = '10px';
@@ -1283,7 +1547,7 @@ class Customer extends Entity {
     leave() {
         this.state = 'LEAVING';
         this.targetTable.occupied = false;
-        this.moveTo(GRID_SIZE - 1, GRID_SIZE - 1);
+        this.moveTo(state.gridSize - 1, state.gridSize - 1);
 
         const checkExit = setInterval(() => {
             if (!this.moving && this.state === 'LEAVING') {
@@ -1301,16 +1565,35 @@ class Customer extends Entity {
                         tip = Math.floor(this.patience / 10); // Normal tip
                     }
 
-                    state.money += (20 + tip);
-                    state.customersServed++;
+                    let payment = 20 + tip;
+                    let xpGain = Math.floor((10 + tip) * bonuses.xpMultiplier);
 
-                    // XP Calculation
-                    const xpGain = Math.floor((10 + tip) * bonuses.xpMultiplier);
+                    // VIP Bonus
+                    if (this.isVip) {
+                        payment *= 3;
+                        xpGain *= 3;
+                        window.game.showFloatText("VIP Bonus! 💎", this.x * TILE_WIDTH, this.y * TILE_HEIGHT, 'purple');
+                    }
+
+                    state.money += payment;
+                    state.customersServed++;
                     window.game.addXp(xpGain);
+
+                    // Gain fame based on customer satisfaction
+                    // More patience left = more fame gained (1-5 fame points)
+                    const satisfactionLevel = this.patience / this.maxPatience;
+                    const fameGain = Math.floor(satisfactionLevel * 5) + 1; // 1-5 fame
+                    if (state.fame < state.maxFame) {
+                        state.fame += fameGain;
+                        state.happyCustomers++;
+                    }
+
+                    // Quest Update
+                    window.game.questManager.checkProgress('serve');
 
                     // Show money popup
                     const popup = document.createElement('div');
-                    popup.textContent = `+$${20 + tip}`;
+                    popup.textContent = `+$${payment}`;
                     popup.className = 'float-text';
                     popup.style.position = 'absolute';
                     popup.style.left = this.element.style.left;
@@ -1336,7 +1619,7 @@ class Customer extends Entity {
         this.bubble.textContent = '😡';
         this.patienceBar.style.display = 'none';
 
-        this.moveTo(GRID_SIZE - 1, GRID_SIZE - 1);
+        this.moveTo(state.gridSize - 1, state.gridSize - 1);
 
         // Angry visual
         this.element.style.filter = 'hue-rotate(90deg)'; // Turn red-ish
