@@ -127,7 +127,7 @@ class Game {
         // Camera State
         this.camera = {
             x: window.innerWidth / 2,
-            y: 100,
+            y: window.innerHeight / 2 - (state.gridSize * TILE_HEIGHT / 2),
             scale: 1,
             isDragging: false,
             lastMouseX: 0,
@@ -481,7 +481,7 @@ class Game {
     }
 
     handleTileHover(x, y) {
-        if (!this.buildMode.active) return;
+        if (!this.buildMode.active && !this.buildMode.isDragging) return;
 
         // If dragging, show preview
         if (this.buildMode.isDragging && this.buildMode.dragStart) {
@@ -577,33 +577,55 @@ class Game {
     }
 
     handleTileMouseDown(x, y, e) {
-        if (!this.buildMode.active) return;
+        // Build Mode Logic
+        if (this.buildMode.active) {
+            // If we have a selected item (like 'table'), we are placing, not dragging
+            if (this.buildMode.selectedItem && this.buildMode.selectedItem !== 'delete') {
+                this.handleTileClick(x, y);
+                return;
+            }
 
-        // If we have a selected item (like 'table'), we are placing, not dragging
-        if (this.buildMode.selectedItem && this.buildMode.selectedItem !== 'delete') {
-            this.handleTileClick(x, y);
+            // If delete mode, delete
+            if (this.buildMode.selectedItem === 'delete') {
+                this.handleTileClick(x, y);
+                return;
+            }
+
+            // Otherwise, check for drag
+            if (this.grid[x][y].furniture) {
+                this.startDragging(x, y);
+                e.stopPropagation(); // Prevent camera drag
+            }
             return;
         }
 
-        // If delete mode, delete
-        if (this.buildMode.selectedItem === 'delete') {
-            this.handleTileClick(x, y);
-            return;
-        }
-
-        // Otherwise, check for drag
+        // Play Mode Logic (Long Press)
+        this.potentialClick = { x, y };
         if (this.grid[x][y].furniture) {
-            this.buildMode.isDragging = true;
-            this.buildMode.dragStart = {
-                x: x,
-                y: y,
-                furniture: this.grid[x][y].furniture
-            };
-            e.stopPropagation(); // Prevent camera drag
+            this.longPressTimer = setTimeout(() => {
+                this.startDragging(x, y);
+                this.potentialClick = null; // Cancel click
+                // Visual feedback for drag start
+                const f = this.grid[x][y].furniture;
+                if (f && f.element) {
+                    f.element.style.opacity = '0.7';
+                }
+            }, 600);
         }
     }
 
+    startDragging(x, y) {
+        this.buildMode.isDragging = true;
+        this.buildMode.dragStart = {
+            x: x,
+            y: y,
+            furniture: this.grid[x][y].furniture
+        };
+    }
+
     handleMouseUp() {
+        clearTimeout(this.longPressTimer);
+
         if (this.buildMode.isDragging && this.buildMode.dragStart) {
             const start = this.buildMode.dragStart;
             const current = this.buildMode.dragCurrent;
@@ -642,7 +664,11 @@ class Game {
             this.buildMode.dragStart = null;
             this.buildMode.dragCurrent = null;
             this.clearHighlights();
+        } else if (this.potentialClick && !this.buildMode.active) {
+            // Handle Click in Play Mode
+            this.handleTileClick(this.potentialClick.x, this.potentialClick.y);
         }
+        this.potentialClick = null;
     }
 
     resetFurniturePosition(f) {
