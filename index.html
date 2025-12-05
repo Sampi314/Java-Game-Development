@@ -4,103 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Restaurant</title>
+    <title>Simple Restaurant</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <div id="ui-layer">
+        <button id="store-btn">Store</button>
+        <div id="store-menu" class="hidden">
+            <h3>Furniture Store</h3>
+            <div class="store-item" data-type="table">
+                <span>Table</span>
+            </div>
+            <div class="store-item" data-type="chair">
+                <span>Chair</span>
+            </div>
+        </div>
+    </div>
     <div id="game-container">
-        <div id="world">
-            <!-- Tiles and entities will be injected here -->
-        </div>
-        <div id="ui-layer">
-            <div id="stats-bar">
-                <div class="stat">💰 <span id="money">100</span></div>
-                <div class="stat">⭐ <span id="level">1</span></div>
-                <div class="stat">✨ <span id="xp">0</span>/<span id="max-xp">100</span></div>
-                <div class="stat">🌟 <span id="fame">0</span>/<span id="max-fame">100</span></div>
-                <div class="stat">👥 <span id="customers-served">0</span></div>
-                <div class="stat">📦 <span id="storage-display">0/20</span> <button onclick="game.upgradeStorage()"
-                        style="font-size: 10px;">+</button></div>
-            </div>
-
-            <!-- Modals -->
-            <div id="market-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <h2>Seed Shop 🌻</h2>
-                    <p>Plant seeds in Garden Plots!</p>
-                    <div class="shop-grid">
-                        <button onclick="game.buySeed('meat', 5)">🥩 Meat Seed ($5)</button>
-                        <button onclick="game.buySeed('bread', 2)">🍞 Wheat Seed ($2)</button>
-                        <button onclick="game.buySeed('cheese', 4)">🧀 Cheese Plant ($4)</button>
-                        <button onclick="game.buySeed('dough', 2)">🌾 Dough Seed ($2)</button>
-                        <button onclick="game.buySeed('sugar', 3)">🍬 Sugar Cane ($3)</button>
-                    </div>
-                    <button class="close-btn" onclick="game.toggleMarket()">Close</button>
-                </div>
-            </div>
-
-            <div id="staff-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <h2>Hiring Agency 🤝</h2>
-                    <div class="shop-grid">
-                        <button onclick="game.hireStaff('chef', 200)">👨‍🍳 Hire Chef ($200)</button>
-                        <button onclick="game.hireStaff('waiter', 150)">🤵 Hire Waiter ($150)</button>
-                    </div>
-                    <button class="close-btn" onclick="game.toggleStaffMenu()">Close</button>
-                </div>
-            </div>
-
-            <div id="notification-modal" class="modal notification-modal" style="display: none;">
-                <div class="notification-content">
-                    <div class="notification-icon" id="notification-icon">ℹ️</div>
-                    <div class="notification-message" id="notification-message"></div>
-                    <button class="notification-btn" onclick="game.closeNotification()">OK</button>
-                </div>
-            </div>
-
-            <div id="quest-board">
-                <h3>Quests 📜</h3>
-                <div id="quest-list"></div>
-            </div>
-
-            <div id="controls">
-                <button id="btn-save" onclick="game.saveGame()">
-                    <span class="btn-icon">💾</span>
-                    <span class="btn-text">Save</span>
-                </button>
-                <button id="btn-market" onclick="game.toggleMarket()">
-                    <span class="btn-icon">🌻</span>
-                    <span class="btn-text">Seeds</span>
-                </button>
-                <button id="btn-staff" onclick="game.toggleStaffMenu()">
-                    <span class="btn-icon">👥</span>
-                    <span class="btn-text">Staff</span>
-                </button>
-                <button id="btn-build-mode" onclick="game.toggleBuildMode()">
-                    <span class="btn-icon">🔨</span>
-                    <span class="btn-text">Build Mode</span>
-                </button>
-                <button id="btn-expand" onclick="game.expandRestaurant()">
-                    <span class="btn-icon">⬆️</span>
-                    <span class="btn-text">Expand (<span id="expand-cost">$1000</span>)</span>
-                </button>
-
-                <div id="build-menu" style="display: none;">
-                    <button onclick="game.setBuildItem('table')">🪑 Table ($50)</button>
-                    <button onclick="game.setBuildItem('stove')">🍳 Stove ($100)</button>
-                    <button onclick="game.setBuildItem('drink_machine')">🥤 Drinks ($150)</button>
-                    <button onclick="game.setBuildItem('counter')">🪵 Counter ($30)</button>
-                    <button onclick="game.setBuildItem('garden')">🌱 Garden Plot ($20)</button>
-                    <div class="separator"></div>
-                    <button onclick="game.setBuildItem('plant')">🪴 Plant ($15)</button>
-                    <button onclick="game.setBuildItem('rug')">🧶 Rug ($10)</button>
-                    <button onclick="game.setBuildItem('lamp')">💡 Lamp ($25)</button>
-                    <div class="separator"></div>
-                    <button onclick="game.setBuildItem('delete')">❌ Delete</button>
-                </div>
-            </div>
-        </div>
+        <div id="world"></div>
     </div>
     <script src="game.js"></script>
 </body>
